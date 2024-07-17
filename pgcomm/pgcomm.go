@@ -102,6 +102,7 @@ func (pgc *PGComm) StreamUpdates(stream pb.PGService_StreamUpdatesServer) error 
 		err = stream.RecvMsg(&uxs)
 
 		if err != nil {
+			fmt.Printf("stream.RecvMsg exited with err = %s\n", err.Error())
 			break
 		}
 
@@ -115,6 +116,7 @@ func (pgc *PGComm) StreamUpdates(stream pb.PGService_StreamUpdatesServer) error 
 	cancel <- true
 
 	if err == io.EOF {
+		fmt.Printf("StreamUpdates returning nil, due toe io.EOF\n")
 		return nil
 	}
 
