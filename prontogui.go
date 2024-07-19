@@ -89,7 +89,9 @@ func (pg *_ProntoGUI) Wait() (updatedPrimitive Primitive, waitError error) {
 	}
 
 	updateIn, waitError = pg.pgcomm.ExchangeUpdates(updateOut)
-	if waitError != nil {
+	if updateIn == nil || waitError != nil {
+		// Require a full update the next time around
+		pg.fullupdate = true
 		return
 	}
 

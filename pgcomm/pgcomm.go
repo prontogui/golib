@@ -15,6 +15,15 @@ import (
 	"google.golang.org/grpc"
 )
 
+// The complete package representing and update go to the app, or coming from the app.
+type UpdatePackage struct {
+	// The ID of the streaming session that this update applies to.
+	sessionId int8
+
+	// The update encoded in bytes
+	cbor []byte
+}
+
 // Implementation of the PGServer
 type PGComm struct {
 	pb.UnimplementedPGServiceServer
@@ -24,21 +33,33 @@ type PGComm struct {
 	// - null reference after calling StopServing().
 	active_server *grpc.Server
 
-	inboundUpdates  chan []byte
-	outboundUpdates chan []byte
+	// TODO:  make a struct holding the session # and []byte (payload).  Build channels of this struct instead.
+	inboundUpdates  chan UpdatePackage
+	outboundUpdates chan UpdatePackage
+
+	// Session ID currently used for streaming updates back and forth.  Updated inside StreamUpdate call.
+	streamingSessionId int8
+
+	// Session ID used within an ExchangeUpdate call.
+	exchangeSessionId int8
+
+	// Channel to signify a new session ID was created, due to previous session was ended.
+	newSessionId chan int8
+
+	// Channel to prevent simultaneous calls the StreamUpdates
+	busyStreaming chan bool
 }
 
 func NewPGComm() *PGComm {
 	pgc := &PGComm{}
-
-	pgc.inboundUpdates = make(chan []byte, 2)
-	pgc.outboundUpdates = make(chan []byte, 2)
-
 	return pgc
 }
 
-// Called as a GO routine, this function pulls updates from a channel and streams them to app.
-func (pgc *PGComm) streamOutboundUpdates(cancel chan bool, stream pb.PGService_StreamUpdatesServer) {
+// Called as a Go routine by StreamUpdates.
+//
+// This function pulls updates from a channel and streams them to app.  It exits upon receiving
+// an value from the cancel channel provided to this function.
+func (pgc *PGComm) streamOutboundUpdates(sessionId int8, cancel chan bool, stream pb.PGService_StreamUpdatesServer) {
 
 	// Loop for every udpate streamed back to caller...
 	for {
@@ -48,50 +69,76 @@ func (pgc *PGComm) streamOutboundUpdates(cancel chan bool, stream pb.PGService_S
 			return
 
 		// When a new update is queued up or channel is closed...
-		case cbor, ok := <-pgc.outboundUpdates:
+		case updatePkg, ok := <-pgc.outboundUpdates:
 			if !ok {
 				return
 			}
 
+			// Ignore if update has a different session # (the previous session ended)
+			if updatePkg.sessionId != sessionId {
+				continue
+			}
+
 			// Package it up into a protobuf structure and stream it out
-			uxs := &pb.PGUpdate{Cbor: cbor}
+			uxs := &pb.PGUpdate{Cbor: updatePkg.cbor}
 			stream.SendMsg(uxs)
 		}
 	}
 }
 
 // Sends an update (as CBOR) to the app and waits for an update to come back.
-func (pgc *PGComm) ExchangeUpdates(updateOut []byte) ([]byte, error) {
+//
+// If successful, this returns an incoming update (which could be empty) and nil for error.
+// If the streaming session was re-established then nil is returned for the update and nil for error.
+// If an error occurred then an error is returned along with nil for the update.
+func (pgc *PGComm) ExchangeUpdates(updateCbor []byte) ([]byte, error) {
+
+	// Build an new update using session # and bytes
+	updateOut := UpdatePackage{sessionId: pgc.exchangeSessionId, cbor: updateCbor}
 
 	// Queue the update to be streamed to app
 	pgc.outboundUpdates <- updateOut
 
-	// Wait for an update from app
-	updateIn, ok := <-pgc.inboundUpdates
-	if !ok {
-		return nil, errors.New("inboundUpdates channel is invalid")
-	}
-
-	/*
-		var cborIn interface{}
-
-		err = cbor.Unmarshal(updateIn, &cborIn)
-		if err != nil {
-			return nil, err
+	select {
+	case pgc.exchangeSessionId = <-pgc.newSessionId:
+		return nil, nil
+	case updateIn, ok := <-pgc.inboundUpdates:
+		if !ok {
+			return nil, errors.New("inboundUpdates channel is invalid")
 		}
-	*/
 
-	return updateIn, nil
+		// Ignore if sessionId of incoming update doesn't match
+		// (This case may not happen in practice but, for logical reasons, we'll treat it just in case.)
+		if updateIn.sessionId != pgc.exchangeSessionId {
+			return nil, nil
+		}
+
+		return updateIn.cbor, nil
+	}
 }
 
 // Implementation of PGServer.StreamUpdates API call.
-// TODO:  properly handle simultaneous calls to this API, e.g. two different apps connected
-// at same time.
+//
+// This function is invoked from a Go routine and it must use thread safety.
 func (pgc *PGComm) StreamUpdates(stream pb.PGService_StreamUpdatesServer) error {
+
+	// Prevent simultaneous calls to this API, e.g. two different apps connected at same time.
+	select {
+	case pgc.busyStreaming <- true:
+
+		notBusy := func() {
+			<-pgc.busyStreaming
+		}
+
+		defer notBusy()
+
+	default:
+		return errors.New("busy streaming updates to another app")
+	}
 
 	// Launch a Go routine to stream mutations back to caller
 	cancel := make(chan bool)
-	go pgc.streamOutboundUpdates(cancel, stream)
+	go pgc.streamOutboundUpdates(pgc.streamingSessionId, cancel, stream)
 
 	// Receive mutations and process them
 	var err error
@@ -102,21 +149,25 @@ func (pgc *PGComm) StreamUpdates(stream pb.PGService_StreamUpdatesServer) error 
 		err = stream.RecvMsg(&uxs)
 
 		if err != nil {
-			fmt.Printf("stream.RecvMsg exited with err = %s\n", err.Error())
 			break
 		}
 
 		// TODO:  This is mainly a debugging aid.  It should be removed for production.
 		fmt.Printf("Update received with %d bytes.\n", len(uxs.Cbor))
 
-		pgc.inboundUpdates <- uxs.Cbor
+		// Queue up a new update package
+		pgc.inboundUpdates <- UpdatePackage{sessionId: pgc.streamingSessionId, cbor: uxs.Cbor}
 	}
 
 	// End the GO routine for streaming outbound updates
 	cancel <- true
+	close(cancel)
+
+	// Increment the streaming session # and put into channel
+	pgc.streamingSessionId = pgc.streamingSessionId + 1
+	pgc.newSessionId <- pgc.streamingSessionId
 
 	if err == io.EOF {
-		fmt.Printf("StreamUpdates returning nil, due toe io.EOF\n")
 		return nil
 	}
 
@@ -126,6 +177,18 @@ func (pgc *PGComm) StreamUpdates(stream pb.PGService_StreamUpdatesServer) error 
 // Starts serving for gRPC calls at specified address and port.  Returns an error if it has
 // problems opening a port for listening.
 func (pgc *PGComm) StartServing(addr string, port int) error {
+
+	if pgc.active_server != nil {
+		return errors.New("PGComm serving already started")
+	}
+
+	// Create the channels to handle "synchronizing by communication" amoung various Go routines.
+	// Note:  there should be no practical need to go beyond 2 entries for each update channel.  Also keep
+	// in mind that the number of entries should not approach the dynamic range of an int8 type (which is 256).
+	pgc.inboundUpdates = make(chan UpdatePackage, 2)
+	pgc.outboundUpdates = make(chan UpdatePackage, 2)
+	pgc.newSessionId = make(chan int8, 1)
+	pgc.busyStreaming = make(chan bool, 1)
 
 	address := fmt.Sprintf("%s:%d", addr, port)
 
@@ -155,5 +218,13 @@ func (pgc *PGComm) StartServing(addr string, port int) error {
 func (pgc *PGComm) StopServing() {
 	if pgc.active_server != nil {
 		pgc.active_server.GracefulStop()
+
+		// Close the channels
+		close(pgc.inboundUpdates)
+		close(pgc.outboundUpdates)
+		close(pgc.newSessionId)
+		close(pgc.busyStreaming)
+
+		pgc.active_server = nil
 	}
 }
