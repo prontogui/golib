@@ -121,3 +121,7 @@ func (r *PrimitiveBase) IngestUpdate(update map[any]any) error {
 
 	return nil
 }
+
+func (r *PrimitiveBase) IndexOf(parentLevel int) int {
+	return 0
+}

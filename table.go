@@ -12,6 +12,7 @@ type TableWith struct {
 	Embodiment  string
 	Headings    []string
 	Rows        [][]Primitive
+	Status      int
 	TemplateRow []Primitive
 }
 
@@ -20,6 +21,7 @@ func (w TableWith) Make() *Table {
 	table.SetEmbodiment(w.Embodiment)
 	table.SetHeadings(w.Headings)
 	table.SetRows(w.Rows)
+	table.SetStatus(w.Status)
 	table.SetTemplateRow(w.TemplateRow)
 	return table
 }
@@ -31,6 +33,7 @@ type Table struct {
 	embodiment  StringField
 	headings    Strings1DField
 	rows        Any2DField
+	status      IntegerField
 	templateRow Any1DField
 }
 
@@ -41,6 +44,7 @@ func (table *Table) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_Embodiment, &table.embodiment},
 			{key.FKey_Headings, &table.headings},
 			{key.FKey_Rows, &table.rows},
+			{key.FKey_Status, &table.status},
 			{key.FKey_TemplateRow, &table.templateRow},
 		}
 	})
@@ -86,18 +90,26 @@ func (table *Table) SetHeadingsVA(items ...string) {
 	table.headings.Set(items)
 }
 
-func (table *Table) TemplateRow() []Primitive {
-	return table.templateRow.Get()
-}
-
-func (table *Table) SetTemplateRow(items []Primitive) {
-	table.templateRow.Set(items)
-}
-
 func (table *Table) Rows() [][]Primitive {
 	return table.rows.Get()
 }
 
 func (table *Table) SetRows(items [][]Primitive) {
 	table.rows.Set(items)
+}
+
+func (table *Table) Status() int {
+	return table.status.Get()
+}
+
+func (table *Table) SetStatus(status int) {
+	table.status.Set(status)
+}
+
+func (table *Table) TemplateRow() []Primitive {
+	return table.templateRow.Get()
+}
+
+func (table *Table) SetTemplateRow(items []Primitive) {
+	table.templateRow.Set(items)
 }

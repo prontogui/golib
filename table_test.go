@@ -13,7 +13,7 @@ import (
 func Test_TableAttachedFields(t *testing.T) {
 	table := &Table{}
 	table.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, table.PrimitiveBase, "Embodiment", "Headings", "Rows", "TemplateRow")
+	verifyAllFieldsAttached(t, table.PrimitiveBase, "Embodiment", "Headings", "Rows", "Status", "TemplateRow")
 }
 
 func Test_TableMake(t *testing.T) {
@@ -21,6 +21,7 @@ func Test_TableMake(t *testing.T) {
 		Embodiment:  "paginated",
 		Headings:    []string{"H1", "H2"},
 		Rows:        [][]Primitive{{&Command{}, &Command{}}, {&Command{}, &Command{}}},
+		Status:      2,
 		TemplateRow: []Primitive{&Command{}, &Command{}},
 	}.Make()
 
@@ -42,6 +43,10 @@ func Test_TableMake(t *testing.T) {
 
 	if len(table.Rows()[1]) != 2 {
 		t.Error("'Rows' field was not initialized correctly")
+	}
+
+	if table.Status() != 2 {
+		t.Error("'Status' field was not initialized correctly")
 	}
 
 	if len(table.TemplateRow()) != 2 {
@@ -91,6 +96,12 @@ func Test_TableFieldSettings(t *testing.T) {
 	_, ok = tableGet[0][1].(*Command)
 	if !ok {
 		t.Error("Second group is not a Command primitive.")
+	}
+
+	// Status field
+	table.SetStatus(2)
+	if table.Status() != 2 {
+		t.Error("Unable to properly set the Status field")
 	}
 
 	// TemplateRow field tests
