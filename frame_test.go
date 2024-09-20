@@ -13,11 +13,16 @@ import (
 func Test_FrameAttachedFields(t *testing.T) {
 	frame := &Frame{}
 	frame.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, frame.PrimitiveBase, "Embodiment", "Showing", "FrameItems")
+	verifyAllFieldsAttached(t, frame.PrimitiveBase, "Embodiment", "FrameItems", "Showing", "Tag")
 }
 
 func Test_FrameMake(t *testing.T) {
-	frame := FrameWith{Showing: true, Embodiment: "full-view", FrameItems: []Primitive{&Command{}, &Command{}}}.Make()
+	frame := FrameWith{
+		Showing:    true,
+		Embodiment: "full-view",
+		FrameItems: []Primitive{&Command{}, &Command{}},
+		Tag:        "F",
+	}.Make()
 
 	if !frame.showing.Get() {
 		t.Error("'Showing' field was not initialized properly")
@@ -29,6 +34,10 @@ func Test_FrameMake(t *testing.T) {
 
 	if len(frame.FrameItems()) != 2 {
 		t.Error("'FrameItems' field was not initialized correctly")
+	}
+
+	if frame.Tag() != "F" {
+		t.Error("'Tag' field was not initialized correctly")
 	}
 }
 
@@ -70,6 +79,10 @@ func Test_FrameFieldSettings(t *testing.T) {
 		t.Error("Second group is not a Text primitive.")
 	}
 
+	frame.SetTag("ABC")
+	if frame.Tag() != "ABC" {
+		t.Error("the Tag field returned the wrong value")
+	}
 }
 
 func Test_FrameLocateChildPrimitive(t *testing.T) {

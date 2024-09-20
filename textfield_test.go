@@ -13,33 +13,44 @@ import (
 func Test_TextFieldAttach(t *testing.T) {
 	txt := &TextField{}
 	txt.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, txt.PrimitiveBase, "TextEntry", "Embodiment")
+	verifyAllFieldsAttached(t, txt.PrimitiveBase, "Embodiment", "Tag", "TextEntry")
 }
 
 func Test_TextFieldMake(t *testing.T) {
 	txt := TextFieldWith{
-		TextEntry:  "This is a piece of text",
 		Embodiment: "block",
+		Tag:        "F",
+		TextEntry:  "This is a piece of text",
 	}.Make()
 
-	if txt.TextEntry() != "This is a piece of text" {
-		t.Error("Could not initialize TextEntry field.")
+	if txt.Embodiment() != "block" {
+		t.Error("could not initialize Embodiment field")
 	}
 
-	if txt.Embodiment() != "block" {
-		t.Error("Could not initialize Embodiment field.")
+	if txt.Tag() != "F" {
+		t.Error("could not initialize Tag field")
+	}
+
+	if txt.TextEntry() != "This is a piece of text" {
+		t.Error("could not initialize TextEntry field")
 	}
 }
 
 func Test_TextFieldFieldSetting(t *testing.T) {
 	txt := &TextField{}
-	txt.SetTextEntry("This is some nice content.")
-	if txt.TextEntry() != "This is some nice content." {
-		t.Error("Could not set Content field.")
-	}
 
 	txt.SetEmbodiment("block")
 	if txt.Embodiment() != "block" {
-		t.Error("Could not set Embodiment fields.")
+		t.Error("could not set Embodiment fields")
+	}
+
+	txt.SetTag("ABC")
+	if txt.Tag() != "ABC" {
+		t.Error("Could not set Tag field.")
+	}
+
+	txt.SetTextEntry("This is some nice content.")
+	if txt.TextEntry() != "This is some nice content." {
+		t.Error("could not set Content field")
 	}
 }

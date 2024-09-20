@@ -14,16 +14,18 @@ type ListWith struct {
 	Embodiment   string
 	ListItems    []Primitive
 	Selected     int
+	Tag          string
 	TemplateItem Primitive
 }
 
 // Creates a new List using the supplied field assignments.
 func (w ListWith) Make() *List {
 	list := &List{}
-	list.SetEmbodiment(w.Embodiment)
+	list.embodiment.Set(w.Embodiment)
 	list.listItems.Set(w.ListItems)
-	list.SetSelected(w.Selected)
-	list.SetTemplateItem(w.TemplateItem)
+	list.selected.Set(w.Selected)
+	list.tag.Set(w.Tag)
+	list.templateItem.Set(w.TemplateItem)
 	return list
 }
 
@@ -36,6 +38,7 @@ type List struct {
 	embodiment   StringField
 	listItems    Any1DField
 	selected     IntegerField
+	tag          StringField
 	templateItem AnyField
 }
 
@@ -54,6 +57,7 @@ func (list *List) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_Embodiment, &list.embodiment},
 			{key.FKey_ListItems, &list.listItems},
 			{key.FKey_Selected, &list.selected},
+			{key.FKey_Tag, &list.tag},
 			{key.FKey_TemplateItem, &list.templateItem},
 		}
 	})
@@ -124,5 +128,18 @@ func (list *List) TemplateItem() Primitive {
 // Sets the template for how each item in the list should look, feel, and behave.
 func (list *List) SetTemplateItem(item Primitive) *List {
 	list.templateItem.Set(item)
+	return list
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Lists inside other containers.
+func (list *List) Tag() string {
+	return list.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Lists inside other containers.
+func (list *List) SetTag(s string) *List {
+	list.tag.Set(s)
 	return list
 }

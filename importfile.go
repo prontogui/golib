@@ -14,6 +14,7 @@ type ImportFileWith struct {
 	Data            []byte
 	Embodiment      string
 	Name            string
+	Tag             string
 	ValidExtensions []string
 }
 
@@ -23,6 +24,7 @@ func (w ImportFileWith) Make() *ImportFile {
 	ifile.data.Set(w.Data)
 	ifile.embodiment.Set(w.Embodiment)
 	ifile.name.Set(w.Name)
+	ifile.tag.Set(w.Tag)
 	ifile.validExtensions.Set(w.ValidExtensions)
 	return ifile
 }
@@ -37,6 +39,7 @@ type ImportFile struct {
 	embodiment      StringField
 	imported        BooleanField
 	name            StringField
+	tag             StringField
 	validExtensions Strings1DField
 }
 
@@ -56,6 +59,7 @@ func (ifile *ImportFile) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunctio
 			{key.FKey_Embodiment, &ifile.embodiment},
 			{key.FKey_Imported, &ifile.imported},
 			{key.FKey_Name, &ifile.name},
+			{key.FKey_Tag, &ifile.tag},
 			{key.FKey_ValidExtensions, &ifile.validExtensions},
 		}
 	})
@@ -115,5 +119,18 @@ func (ifile *ImportFile) ValidExtensions() []string {
 // Sets the valid extensions for importing (non-case sensitive and period separator is omitted).
 func (ifile *ImportFile) SetValidExtensions(sa []string) *ImportFile {
 	ifile.validExtensions.Set(sa)
+	return ifile
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Commands as Table cells.
+func (ifile *ImportFile) Tag() string {
+	return ifile.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Commands as Table cells.
+func (ifile *ImportFile) SetTag(s string) *ImportFile {
+	ifile.tag.Set(s)
 	return ifile
 }

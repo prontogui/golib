@@ -13,13 +13,14 @@ import (
 func Test_GroupAttachedFields(t *testing.T) {
 	grp := &Group{}
 	grp.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, grp.PrimitiveBase, "Embodiment", "GroupItems")
+	verifyAllFieldsAttached(t, grp.PrimitiveBase, "Embodiment", "GroupItems", "Tag")
 }
 
 func Test_GroupMake(t *testing.T) {
 	grp := GroupWith{
 		Embodiment: "row",
 		GroupItems: []Primitive{&Command{}, &Command{}},
+		Tag:        "F",
 	}.Make()
 
 	if grp.Embodiment() != "row" {
@@ -28,6 +29,10 @@ func Test_GroupMake(t *testing.T) {
 
 	if len(grp.GroupItems()) != 2 {
 		t.Error("'GroupItems' field was not initialized correctly")
+	}
+
+	if grp.Tag() != "F" {
+		t.Error("'Tag' field was not initialized correctly")
 	}
 }
 
@@ -74,6 +79,10 @@ func Test_GroupFieldSettings(t *testing.T) {
 		t.Error("Second group is not a Text primitive.")
 	}
 
+	grp.SetTag("ABC")
+	if grp.Tag() != "ABC" {
+		t.Error("Could not set Tag field.")
+	}
 }
 
 func Test_GroupLocateChildPrimitive(t *testing.T) {

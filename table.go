@@ -17,17 +17,19 @@ type TableWith struct {
 	Headings    []string
 	Rows        [][]Primitive
 	Status      int
+	Tag         string
 	TemplateRow []Primitive
 }
 
 // Creates a new Table using the supplied field assignments.
 func (w TableWith) Make() *Table {
 	table := &Table{}
-	table.SetEmbodiment(w.Embodiment)
-	table.SetHeadings(w.Headings)
-	table.SetRows(w.Rows)
-	table.SetStatus(w.Status)
-	table.SetTemplateRow(w.TemplateRow)
+	table.embodiment.Set(w.Embodiment)
+	table.headings.Set(w.Headings)
+	table.rows.Set(w.Rows)
+	table.status.Set(w.Status)
+	table.tag.Set(w.Tag)
+	table.templateRow.Set(w.TemplateRow)
 	return table
 }
 
@@ -40,6 +42,7 @@ type Table struct {
 	headings    Strings1DField
 	rows        Any2DField
 	status      IntegerField
+	tag         StringField
 	templateRow Any1DField
 }
 
@@ -59,6 +62,7 @@ func (table *Table) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_Headings, &table.headings},
 			{key.FKey_Rows, &table.rows},
 			{key.FKey_Status, &table.status},
+			{key.FKey_Tag, &table.tag},
 			{key.FKey_TemplateRow, &table.templateRow},
 		}
 	})
@@ -133,6 +137,19 @@ func (table *Table) Status() int {
 // Sets the status of the table:  0 = Table Normal, 1 = Table Disabled, 2 = Table Hidden.
 func (table *Table) SetStatus(status int) *Table {
 	table.status.Set(status)
+	return table
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Tables inside other containers.
+func (table *Table) Tag() string {
+	return table.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Tables inside other containers.
+func (table *Table) SetTag(s string) *Table {
+	table.tag.Set(s)
 	return table
 }
 

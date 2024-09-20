@@ -14,11 +14,16 @@ import (
 func Test_ChoiceAttachedFields(t *testing.T) {
 	cmd := &Choice{}
 	cmd.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, cmd.PrimitiveBase, "Choice", "Choices", "Embodiment")
+	verifyAllFieldsAttached(t, cmd.PrimitiveBase, "Choice", "Choices", "Embodiment", "Tag")
 }
 
 func Test_ChoiceMake(t *testing.T) {
-	choice := ChoiceWith{Choice: "Apple", Choices: []string{"Apple", "Orange"}, Embodiment: "checkmark"}.Make()
+	choice := ChoiceWith{
+		Choice:     "Apple",
+		Choices:    []string{"Apple", "Orange"},
+		Embodiment: "checkmark",
+		Tag:        "F",
+	}.Make()
 
 	if choice.Choice() != "Apple" {
 		t.Error("Could not initialize Choice field.")
@@ -30,6 +35,10 @@ func Test_ChoiceMake(t *testing.T) {
 
 	if choice.Embodiment() != "checkmark" {
 		t.Error("Could not initialize Embodiment field.")
+	}
+
+	if choice.Tag() != "F" {
+		t.Error("Could not initialize Tag field.")
 	}
 }
 
@@ -55,5 +64,10 @@ func Test_ChoiceFieldSettings(t *testing.T) {
 	choice.SetEmbodiment("checkmark")
 	if choice.Embodiment() != "checkmark" {
 		t.Error("Could not set Embodiment field")
+	}
+
+	choice.SetTag("ABC")
+	if choice.Tag() != "ABC" {
+		t.Error("Could not set Tag field.")
 	}
 }

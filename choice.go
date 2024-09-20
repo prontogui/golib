@@ -13,6 +13,7 @@ type ChoiceWith struct {
 	Choice     string
 	Choices    []string
 	Embodiment string
+	Tag        string
 }
 
 // Makes a new Choice with specified field values.
@@ -21,6 +22,7 @@ func (w ChoiceWith) Make() *Choice {
 	choice.choice.Set(w.Choice)
 	choice.choices.Set(w.Choices)
 	choice.embodiment.Set(w.Embodiment)
+	choice.tag.Set(w.Tag)
 	return choice
 }
 
@@ -32,6 +34,7 @@ type Choice struct {
 	choice     StringField
 	choices    Strings1DField
 	embodiment StringField
+	tag        StringField
 }
 
 // Creates a new Choice and assigns the initiali Choice and Choices fields.
@@ -49,6 +52,7 @@ func (choice *Choice) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) 
 			{key.FKey_Choice, &choice.choice},
 			{key.FKey_Choices, &choice.choices},
 			{key.FKey_Embodiment, &choice.embodiment},
+			{key.FKey_Tag, &choice.tag},
 		}
 	})
 }
@@ -95,5 +99,18 @@ func (choice *Choice) Embodiment() string {
 // Sets a JSON string specifying the embodiment to use for this primitive.
 func (choice *Choice) SetEmbodiment(s string) *Choice {
 	choice.embodiment.Set(s)
+	return choice
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Choices as Table cells.
+func (choice *Choice) Tag() string {
+	return choice.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Choices as Table cells.
+func (choice *Choice) SetTag(s string) *Choice {
+	choice.tag.Set(s)
 	return choice
 }

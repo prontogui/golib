@@ -18,6 +18,7 @@ type ImageWith struct {
 	Embodiment string
 	Image      []byte
 	FromFile   string
+	Tag        string
 }
 
 // Makes a new Image with specified field values.
@@ -33,6 +34,8 @@ func (w ImageWith) Make() *Image {
 	} else {
 		image.image.Set(w.Image)
 	}
+
+	image.tag.Set(w.Tag)
 	return image
 }
 
@@ -43,6 +46,7 @@ type Image struct {
 
 	embodiment StringField
 	image      BlobField
+	tag        StringField
 }
 
 // Creates a new Image from a file.  (EXPERIMENTAL)
@@ -59,6 +63,7 @@ func (image *Image) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 		return []FieldRef{
 			{key.FKey_Embodiment, &image.embodiment},
 			{key.FKey_Image, &image.image},
+			{key.FKey_Tag, &image.tag},
 		}
 	})
 }
@@ -100,4 +105,17 @@ func loadImageFromFile(filePath string) *image.RGBA {
 	}
 
 	return img.(*image.RGBA)
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Commands as Table cells.
+func (image *Image) Tag() string {
+	return image.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Commands as Table cells.
+func (image *Image) SetTag(s string) *Image {
+	image.tag.Set(s)
+	return image
 }

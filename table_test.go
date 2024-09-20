@@ -14,7 +14,7 @@ import (
 func Test_TableAttachedFields(t *testing.T) {
 	table := &Table{}
 	table.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, table.PrimitiveBase, "Embodiment", "Headings", "Rows", "Status", "TemplateRow")
+	verifyAllFieldsAttached(t, table.PrimitiveBase, "Embodiment", "Headings", "Rows", "Status", "Tag", "TemplateRow")
 }
 
 func Test_TableMake(t *testing.T) {
@@ -23,6 +23,7 @@ func Test_TableMake(t *testing.T) {
 		Headings:    []string{"H1", "H2"},
 		Rows:        [][]Primitive{{&Command{}, &Command{}}, {&Command{}, &Command{}}},
 		Status:      2,
+		Tag:         "F",
 		TemplateRow: []Primitive{&Command{}, &Command{}},
 	}.Make()
 
@@ -48,6 +49,10 @@ func Test_TableMake(t *testing.T) {
 
 	if table.Status() != 2 {
 		t.Error("'Status' field was not initialized correctly")
+	}
+
+	if table.Tag() != "F" {
+		t.Error("'Tag' field was not initialized correctly")
 	}
 
 	if len(table.TemplateRow()) != 2 {
@@ -103,6 +108,12 @@ func Test_TableFieldSettings(t *testing.T) {
 	table.SetStatus(2)
 	if table.Status() != 2 {
 		t.Error("Unable to properly set the Status field")
+	}
+
+	// Tag field
+	table.SetTag("ABC")
+	if table.Tag() != "ABC" {
+		t.Error("unable to set the Tag field.")
 	}
 
 	// TemplateRow field tests

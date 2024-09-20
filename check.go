@@ -14,6 +14,7 @@ type CheckWith struct {
 	Checked    bool
 	Embodiment string
 	Label      string
+	Tag        string
 }
 
 // Makes a new Check with specified field values.
@@ -22,6 +23,7 @@ func (w CheckWith) Make() *Check {
 	check.checked.Set(w.Checked)
 	check.embodiment.Set(w.Embodiment)
 	check.label.Set(w.Label)
+	check.tag.Set(w.Tag)
 	return check
 }
 
@@ -34,6 +36,7 @@ type Check struct {
 	checked    BooleanField
 	embodiment StringField
 	label      StringField
+	tag        StringField
 }
 
 // Creates a new Check and assigns a label.
@@ -51,6 +54,7 @@ func (check *Check) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_Checked, &check.checked},
 			{key.FKey_Embodiment, &check.embodiment},
 			{key.FKey_Label, &check.label},
+			{key.FKey_Tag, &check.tag},
 		}
 	})
 }
@@ -91,5 +95,18 @@ func (check *Check) Label() string {
 // Sets the label to display in the check.
 func (check *Check) SetLabel(s string) *Check {
 	check.label.Set(s)
+	return check
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Checks as Table cells.
+func (check *Check) Tag() string {
+	return check.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Checks as Table cells.
+func (check *Check) SetTag(s string) *Check {
+	check.tag.Set(s)
 	return check
 }

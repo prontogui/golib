@@ -12,6 +12,7 @@ import (
 type TextWith struct {
 	Content    string
 	Embodiment string
+	Tag        string
 }
 
 // Creates a new Text primitive using the supplief field assignments.
@@ -19,6 +20,7 @@ func (w TextWith) Make() *Text {
 	text := &Text{}
 	text.content.Set(w.Content)
 	text.embodiment.Set(w.Embodiment)
+	text.tag.Set(w.Tag)
 	return text
 }
 
@@ -29,6 +31,7 @@ type Text struct {
 
 	content    StringField
 	embodiment StringField
+	tag        StringField
 }
 
 // Create a new Text and assign its content.
@@ -45,6 +48,7 @@ func (txt *Text) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 		return []FieldRef{
 			{key.FKey_Content, &txt.content},
 			{key.FKey_Embodiment, &txt.embodiment},
+			{key.FKey_Tag, &txt.tag},
 		}
 	})
 }
@@ -74,5 +78,18 @@ func (txt *Text) Embodiment() string {
 // Sets a JSON string specifying the embodiment to use for this primitive.
 func (txt *Text) SetEmbodiment(s string) *Text {
 	txt.embodiment.Set(s)
+	return txt
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Texts as Table cells.
+func (txt *Text) Tag() string {
+	return txt.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Texts as Table cells.
+func (txt *Text) SetTag(s string) *Text {
+	txt.tag.Set(s)
 	return txt
 }

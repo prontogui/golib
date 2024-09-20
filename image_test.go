@@ -13,18 +13,26 @@ import (
 func Test_ImageAttachedFields(t *testing.T) {
 	image := &Image{}
 	image.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, image.PrimitiveBase, "Embodiment", "Image")
+	verifyAllFieldsAttached(t, image.PrimitiveBase, "Embodiment", "Image", "Tag")
 }
 
 func Test_ImageMake1(t *testing.T) {
-	image := ImageWith{Embodiment: "black-white", Image: []byte{0, 1, 2}}.Make()
+	image := ImageWith{
+		Embodiment: "black-white",
+		Image:      []byte{0, 1, 2},
+		Tag:        "F",
+	}.Make()
 
 	if image.Embodiment() != "black-white" {
-		t.Error("Could not initialize Embodiment field.")
+		t.Error("could not initialize Embodiment field")
 	}
 
 	if len(image.Image()) != 3 {
-		t.Error("Could not initialize Image field.")
+		t.Error("could not initialize Image field")
+	}
+
+	if image.Tag() != "F" {
+		t.Error("could not initialize Tag field")
 	}
 }
 
@@ -52,5 +60,10 @@ func Test_ImageFieldSetting(t *testing.T) {
 	image.SetImage([]byte{0, 1, 2})
 	if len(image.Image()) != 3 {
 		t.Error("Could not set Image field.")
+	}
+
+	image.SetTag("ABC")
+	if image.Tag() != "ABC" {
+		t.Error("Could not set Tag field.")
 	}
 }

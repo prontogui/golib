@@ -13,7 +13,7 @@ import (
 func Test_ListAttachedFields(t *testing.T) {
 	list := &List{}
 	list.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, list.PrimitiveBase, "Embodiment", "ListItems", "Selected", "TemplateItem")
+	verifyAllFieldsAttached(t, list.PrimitiveBase, "Embodiment", "ListItems", "Selected", "Tag", "TemplateItem")
 }
 
 func Test_ListMake(t *testing.T) {
@@ -21,6 +21,7 @@ func Test_ListMake(t *testing.T) {
 		Embodiment:   "scrolling",
 		ListItems:    []Primitive{&Command{}, &Command{}},
 		Selected:     1,
+		Tag:          "F",
 		TemplateItem: &Command{},
 	}.Make()
 
@@ -36,10 +37,15 @@ func Test_ListMake(t *testing.T) {
 		t.Error("List selection not initialized properly")
 	}
 
+	if list.Tag() != "F" {
+		t.Error("Tag field was not initialized correctly")
+	}
+
 	_, ok := list.TemplateItem().(*Command)
 	if !ok {
 		t.Error("TemplateItem is not initialized properly")
 	}
+
 }
 
 func Test_ListFieldSettings(t *testing.T) {
@@ -105,6 +111,12 @@ func Test_ListFieldSettings(t *testing.T) {
 	list.SetSelected(1)
 	if list.Selected() != 1 {
 		t.Error("Unable to set seletion to 1")
+	}
+
+	// Tag field test
+	list.SetTag("ABC")
+	if list.Tag() != "ABC" {
+		t.Error("unable to set Tag field")
 	}
 
 	// TemplateItem field tests

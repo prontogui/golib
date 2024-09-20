@@ -14,6 +14,7 @@ type TristateWith struct {
 	Embodiment string
 	Label      string
 	State      int
+	Tag        string
 }
 
 // Creates a new TriState using the supplied field assignments.
@@ -22,6 +23,7 @@ func (w TristateWith) Make() *Tristate {
 	tri.embodiment.Set(w.Embodiment)
 	tri.label.Set(w.Label)
 	tri.state.Set(w.State)
+	tri.tag.Set(w.Tag)
 	return tri
 }
 
@@ -34,6 +36,7 @@ type Tristate struct {
 	embodiment StringField
 	label      StringField
 	state      IntegerField
+	tag        StringField
 }
 
 // Create a new TriState and assign a label.
@@ -51,6 +54,7 @@ func (tri *Tristate) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_Embodiment, &tri.embodiment},
 			{key.FKey_Label, &tri.label},
 			{key.FKey_State, &tri.state},
+			{key.FKey_Tag, &tri.tag},
 		}
 	})
 }
@@ -91,5 +95,18 @@ func (tri *Tristate) State() int {
 // Sets the state of the option (0 = Negative, 1 = Affirmative, and -1 = Indeterminate).
 func (tri *Tristate) SetState(i int) *Tristate {
 	tri.state.Set(i)
+	return tri
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Tristates as Table cells.
+func (tri *Tristate) Tag() string {
+	return tri.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Tristates as Table cells.
+func (tri *Tristate) SetTag(s string) *Tristate {
+	tri.tag.Set(s)
 	return tri
 }

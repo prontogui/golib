@@ -16,6 +16,7 @@ type ExportFileWith struct {
 	Data       []byte
 	Embodiment string
 	Name       string
+	Tag        string
 }
 
 // Makes a new Command with specified field values.
@@ -24,6 +25,7 @@ func (w ExportFileWith) Make() *ExportFile {
 	ef.data.Set(w.Data)
 	ef.embodiment.Set(w.Embodiment)
 	ef.name.Set(w.Name)
+	ef.tag.Set(w.Tag)
 	return ef
 }
 
@@ -39,6 +41,7 @@ type ExportFile struct {
 	embodiment StringField
 	exported   BooleanField
 	name       StringField
+	tag        StringField
 }
 
 // Creates a new ExportFile.
@@ -57,6 +60,7 @@ func (ef *ExportFile) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) 
 			{key.FKey_Embodiment, &ef.embodiment},
 			{key.FKey_Exported, &ef.exported},
 			{key.FKey_Name, &ef.name},
+			{key.FKey_Tag, &ef.tag},
 		}
 	})
 }
@@ -104,5 +108,18 @@ func (ef *ExportFile) Name() string {
 // Sets the suggested file name (including its extension separated by a period) to save the file as.
 func (ef *ExportFile) SetName(s string) *ExportFile {
 	ef.name.Set(s)
+	return ef
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using ExportFiles as Table cells.
+func (ef *ExportFile) Tag() string {
+	return ef.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using ExportFiles as Table cells.
+func (ef *ExportFile) SetTag(s string) *ExportFile {
+	ef.tag.Set(s)
 	return ef
 }

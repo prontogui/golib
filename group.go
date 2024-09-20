@@ -14,6 +14,7 @@ import (
 type GroupWith struct {
 	Embodiment string
 	GroupItems []Primitive
+	Tag        string
 }
 
 // Creates a new Group using the supplied field assignments.
@@ -21,6 +22,7 @@ func (w GroupWith) Make() *Group {
 	grp := &Group{}
 	grp.embodiment.Set(w.Embodiment)
 	grp.groupItems.Set(w.GroupItems)
+	grp.tag.Set(w.Tag)
 	return grp
 }
 
@@ -33,6 +35,7 @@ type Group struct {
 
 	embodiment StringField
 	groupItems Any1DField
+	tag        StringField
 }
 
 // Creates a new Group and assigns items.
@@ -49,6 +52,7 @@ func (grp *Group) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 		return []FieldRef{
 			{key.FKey_Embodiment, &grp.embodiment},
 			{key.FKey_GroupItems, &grp.groupItems},
+			{key.FKey_Tag, &grp.tag},
 		}
 	})
 }
@@ -88,5 +92,18 @@ func (grp *Group) SetGroupItems(items []Primitive) *Group {
 // Sets the collection of primitives (a variadic argument list) that make up the group.
 func (grp *Group) SetGroupItemsVA(items ...Primitive) *Group {
 	grp.groupItems.Set(items)
+	return grp
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Groups inside other containers.
+func (grp *Group) Tag() string {
+	return grp.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Groups inside other containers.
+func (grp *Group) SetTag(s string) *Group {
+	grp.tag.Set(s)
 	return grp
 }

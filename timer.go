@@ -15,14 +15,16 @@ import (
 type TimerWith struct {
 	Embodiment string
 	PeriodMs   int
+	Tag        string
 }
 
 // Makes a new Timer with specified field values.
 func (w TimerWith) Make() *Timer {
-	cmd := &Timer{}
-	cmd.embodiment.Set(w.Embodiment)
-	cmd.periodMs.Set(w.PeriodMs)
-	return cmd
+	timer := &Timer{}
+	timer.embodiment.Set(w.Embodiment)
+	timer.periodMs.Set(w.PeriodMs)
+	timer.tag.Set(w.Tag)
+	return timer
 }
 
 // A timer is an invisible primitive that fires an event, triggering an update
@@ -35,6 +37,7 @@ type Timer struct {
 
 	embodiment StringField
 	periodMs   IntegerField
+	tag        StringField
 }
 
 // Create a new Timer with period in milliseconds.
@@ -51,6 +54,7 @@ func (tmr *Timer) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 		return []FieldRef{
 			{key.FKey_Embodiment, &tmr.embodiment},
 			{key.FKey_PeriodMs, &tmr.periodMs},
+			{key.FKey_Tag, &tmr.tag},
 		}
 	})
 }
@@ -78,5 +82,18 @@ func (tmr *Timer) PeriodMs() int {
 // will cause the timer to fire immediately after the primitive is updated.
 func (tmr *Timer) SetPeriodMs(i int) *Timer {
 	tmr.periodMs.Set(i)
+	return tmr
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Timers inside containers.
+func (tmr *Timer) Tag() string {
+	return tmr.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Timers inside containers.
+func (tmr *Timer) SetTag(s string) *Timer {
+	tmr.tag.Set(s)
 	return tmr
 }

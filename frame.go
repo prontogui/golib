@@ -13,8 +13,9 @@ import (
 // layout controls in a specific manner.
 type FrameWith struct {
 	Embodiment string
-	Showing    bool
 	FrameItems []Primitive
+	Showing    bool
+	Tag        string
 }
 
 // Creates a new Frame using the supplied field assignments.
@@ -23,6 +24,7 @@ func (w FrameWith) Make() *Frame {
 	frame.embodiment.Set(w.Embodiment)
 	frame.showing.Set(w.Showing)
 	frame.frameItems.Set(w.FrameItems)
+	frame.tag.Set(w.Tag)
 	return frame
 }
 
@@ -34,8 +36,9 @@ type Frame struct {
 	PrimitiveBase
 
 	embodiment StringField
-	showing    BooleanField
 	frameItems Any1DField
+	showing    BooleanField
+	tag        StringField
 }
 
 // Creates a new Frame and assigns a set of items.
@@ -53,6 +56,7 @@ func (frame *Frame) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_Embodiment, &frame.embodiment},
 			{key.FKey_FrameItems, &frame.frameItems},
 			{key.FKey_Showing, &frame.showing},
+			{key.FKey_Tag, &frame.tag},
 		}
 	})
 }
@@ -103,5 +107,18 @@ func (frame *Frame) Showing() bool {
 // Sets whether the Frame is being shown on the screen.
 func (frame *Frame) SetShowing(showing bool) *Frame {
 	frame.showing.Set(showing)
+	return frame
+}
+
+// Returns an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, such as using Frames inside other containers.
+func (frame *Frame) Tag() string {
+	return frame.tag.Get()
+}
+
+// Sets an optional and arbitrary string to keep with this primitive.  This is useful for
+// identification later on, uch as using Frames inside other containers.
+func (frame *Frame) SetTag(s string) *Frame {
+	frame.tag.Set(s)
 	return frame
 }
