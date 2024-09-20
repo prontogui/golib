@@ -4,9 +4,14 @@
 
 package golib
 
-import "github.com/prontogui/golib/key"
+import (
+	"fmt"
+
+	"github.com/prontogui/golib/key"
+)
 
 type Primitive interface {
+	fmt.Stringer
 	PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction)
 	LocateNextDescendant(locator *key.PKeyLocator) Primitive
 	EgestUpdate(fullupdate bool, fkeys []key.FKey) map[any]any

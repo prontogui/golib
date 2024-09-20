@@ -5,6 +5,7 @@
 package golib
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/prontogui/golib/key"
@@ -161,5 +162,157 @@ func Test_TableGetChildPrimitive(t *testing.T) {
 
 	if locate(key.NewPKey(1, 1)).Label() != "b" {
 		t.Fatal("LocateNextDescendant doesn't return a child for pkey 1, 1.")
+	}
+}
+
+func _prepareTableForInsert() *Table {
+	table := &Table{}
+
+	r0c0 := CommandWith{Label: "r0c0"}.Make()
+	r0c1 := TextWith{Content: "r0c1"}.Make()
+	r1c0 := CommandWith{Label: "r1c0"}.Make()
+	r1c1 := TextWith{Content: "r1c1"}.Make()
+	r2c0 := CommandWith{Label: "r2c0"}.Make()
+	r2c1 := TextWith{Content: "r2c1"}.Make()
+
+	table.SetRows([][]Primitive{{r0c0, r0c1}, {r1c0, r1c1}, {r2c0, r2c1}})
+	table.SetTemplateRow([]Primitive{r0c0, r0c1})
+
+	return table
+}
+
+func _prepareNewRowForInsert() []Primitive {
+	newc0 := CommandWith{Label: "newc0"}.Make()
+	newc1 := TextWith{Content: "newc1"}.Make()
+	return []Primitive{newc0, newc1}
+}
+
+func _verifyRowsAfterInsertion(t *testing.T, table *Table, originalRows [3]int, newRow int) {
+
+	numRows := len(table.Rows())
+	if numRows != 4 {
+		t.Fatalf("number of rows after insertion is:  %d. Expecting 4.", numRows)
+	}
+
+	testfunc := func(row int, prefix string) {
+		cmd := table.Rows()[row][0].(*Command)
+		text := table.Rows()[row][1].(*Text)
+
+		cmdLabel := fmt.Sprintf("%sc0", prefix)
+		textContent := fmt.Sprintf("%sc1", prefix)
+
+		if cmd.Label() != cmdLabel || text.Content() != textContent {
+			t.Errorf("row %d does not have the correct information after insertion", row)
+		}
+	}
+
+	testfunc(originalRows[0], "r0")
+	testfunc(originalRows[1], "r1")
+	testfunc(originalRows[2], "r2")
+	testfunc(newRow, "new")
+}
+
+func Test_TableInsertRow0(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	table.InsertRow(0, _prepareNewRowForInsert())
+
+	_verifyRowsAfterInsertion(t, table, [3]int{1, 2, 3}, 0)
+}
+
+func Test_TableInsertRow1(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	table.InsertRow(1, _prepareNewRowForInsert())
+
+	_verifyRowsAfterInsertion(t, table, [3]int{0, 2, 3}, 1)
+}
+
+func Test_TableInsertRow2(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	table.InsertRow(-1, _prepareNewRowForInsert())
+
+	_verifyRowsAfterInsertion(t, table, [3]int{0, 1, 2}, 3)
+}
+
+func Test_TableInsertRow3(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	table.InsertRow(3, _prepareNewRowForInsert())
+
+	_verifyRowsAfterInsertion(t, table, [3]int{0, 1, 2}, 3)
+}
+
+func _verifyRowsAfterDeletion(t *testing.T, table *Table, rowsLeft [2]int) {
+
+	numRows := len(table.Rows())
+	if numRows != 2 {
+		t.Fatalf("number of rows after deletion is:  %d. Expecting 2.", numRows)
+	}
+
+	testfunc := func(row int, oldRow int) {
+		cmd := table.Rows()[row][0].(*Command)
+		text := table.Rows()[row][1].(*Text)
+
+		cmdLabel := fmt.Sprintf("r%dc0", oldRow)
+		textContent := fmt.Sprintf("r%dc1", oldRow)
+
+		if cmd.Label() != cmdLabel || text.Content() != textContent {
+			t.Errorf("row %d does not have the correct information after insertion", row)
+		}
+	}
+
+	testfunc(0, rowsLeft[0])
+	testfunc(1, rowsLeft[1])
+}
+
+func Test_TableDeleteRow0(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	table.DeleteRow(0)
+
+	_verifyRowsAfterDeletion(t, table, [2]int{1, 2})
+}
+
+func Test_TableDeleteRow1(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	table.DeleteRow(1)
+
+	_verifyRowsAfterDeletion(t, table, [2]int{0, 2})
+}
+
+func Test_TableDeleteRow2(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	table.DeleteRow(2)
+
+	_verifyRowsAfterDeletion(t, table, [2]int{0, 1})
+}
+
+func Test_TableDeleteRow3(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	err := table.DeleteRow(3)
+
+	if err == nil {
+		t.Fatal("no error returned")
+	}
+	if err.Error() != "index out of range" {
+		t.Fatal("unexpected error returned")
+	}
+}
+
+func Test_TableDeleteRow4(t *testing.T) {
+
+	table := _prepareTableForInsert()
+	err := table.DeleteRow(-1)
+
+	if err == nil {
+		t.Fatal("no error returned")
+	}
+	if err.Error() != "index out of range" {
+		t.Fatal("unexpected error returned")
 	}
 }

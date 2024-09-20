@@ -12,6 +12,7 @@ import (
 
 // PrimitiveBase fields for primitive updates.
 type PrimitiveBase struct {
+	pkey   key.PKey
 	fields []FieldRef
 }
 
@@ -24,6 +25,8 @@ type FieldRef struct {
 }
 
 func (r *PrimitiveBase) InternalPrepareForUpdates(pkey key.PKey, onset key.OnSetFunction, getFields func() []FieldRef) {
+
+	r.pkey = pkey
 
 	// Attach fields (if not done already)
 	if len(r.fields) == 0 {
@@ -122,6 +125,23 @@ func (r *PrimitiveBase) IngestUpdate(update map[any]any) error {
 	return nil
 }
 
+// Returns the index of this primitive in a parent container specified by parentLevel as follows:
+// parentLevel = 0, immediate parent container
+// parentLevel = 1, grandparent
+// parentLevel = 2, great grandparent
+// And so on.
+//
+// It returns -1 if parentLevel is a negative number or is invalid given the depth where the primitive belongs.
 func (r *PrimitiveBase) IndexOf(parentLevel int) int {
-	return 0
+	len := r.pkey.Len()
+
+	if parentLevel >= 0 && parentLevel < len {
+		return r.pkey.IndexAtLevel(len - parentLevel - 1)
+	}
+	return -1
+}
+
+// Default implementation of fmt:Stringer interface.
+func (r *PrimitiveBase) String() string {
+	return ""
 }

@@ -8,6 +8,10 @@ import (
 	"github.com/prontogui/golib/key"
 )
 
+// A timer is an invisible primitive that fires an event, triggering an update
+// to the server.  This is useful for low-precision GUI updates that originate
+// on the server side.  An example is updating "live" readings from a running
+// process on the server.
 type TimerWith struct {
 	Embodiment string
 	PeriodMs   int
@@ -21,6 +25,10 @@ func (w TimerWith) Make() *Timer {
 	return cmd
 }
 
+// A timer is an invisible primitive that fires an event, triggering an update
+// to the server.  This is useful for low-precision GUI updates that originate
+// on the server side.  An example is updating "live" readings from a running
+// process on the server.
 type Timer struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
@@ -29,6 +37,14 @@ type Timer struct {
 	periodMs   IntegerField
 }
 
+// Create a new Timer with period in milliseconds.
+func NewTimer(periodMs int) *Timer {
+	return TimerWith{PeriodMs: periodMs}.Make()
+}
+
+// Prepares the primitive for tracking pending updates to send to the app and
+// for injesting updates from the app.  This is used internally by this library
+// and normally should not be called by users of the library.
 func (tmr *Timer) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 
 	tmr.InternalPrepareForUpdates(pkey, onset, func() []FieldRef {
@@ -39,18 +55,28 @@ func (tmr *Timer) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 	})
 }
 
+// Returns a JSON string specifying the embodiment to use for this primitive.
 func (tmr *Timer) Embodiment() string {
 	return tmr.embodiment.Get()
 }
 
-func (tmr *Timer) SetEmbodiment(s string) {
+// Sets a JSON string specifying the embodiment to use for this primitive.
+func (tmr *Timer) SetEmbodiment(s string) *Timer {
 	tmr.embodiment.Set(s)
+	return tmr
 }
 
+// Returns the time period in milliseconds after which the timer fires an event.  If the
+// period is -1 (or any negative number) then the timer is disabled.  A period of 0
+// will cause the timer to fire immediately after the primitive is updated.
 func (tmr *Timer) PeriodMs() int {
 	return tmr.periodMs.Get()
 }
 
-func (tmr *Timer) SetPeriodMs(i int) {
+// Sets the time period in milliseconds after which the timer fires an event.  If the
+// period is -1 (or any negative number) then the timer is disabled.  A period of 0
+// will cause the timer to fire immediately after the primitive is updated.
+func (tmr *Timer) SetPeriodMs(i int) *Timer {
 	tmr.periodMs.Set(i)
+	return tmr
 }

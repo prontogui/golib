@@ -8,6 +8,8 @@ import (
 	"github.com/prontogui/golib/key"
 )
 
+// A file that represents a blob of data that can be imported from the app side
+// and consumed on the server side.
 type ImportFileWith struct {
 	Data            []byte
 	Embodiment      string
@@ -15,7 +17,7 @@ type ImportFileWith struct {
 	ValidExtensions []string
 }
 
-// Makes a new Command with specified field values.
+// Makes a new ImportFile with specified field values.
 func (w ImportFileWith) Make() *ImportFile {
 	ifile := &ImportFile{}
 	ifile.data.Set(w.Data)
@@ -25,6 +27,8 @@ func (w ImportFileWith) Make() *ImportFile {
 	return ifile
 }
 
+// A file that represents a blob of data that can be imported from the app side
+// and consumed on the server side.
 type ImportFile struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
@@ -36,6 +40,14 @@ type ImportFile struct {
 	validExtensions Strings1DField
 }
 
+// Creates a new ImportFile.
+func NewImportFile() *ImportFile {
+	return ImportFileWith{}.Make()
+}
+
+// Prepares the primitive for tracking pending updates to send to the app and
+// for injesting updates from the app.  This is used internally by this library
+// and normally should not be called by users of the library.
 func (ifile *ImportFile) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 
 	ifile.InternalPrepareForUpdates(pkey, onset, func() []FieldRef {
@@ -49,42 +61,59 @@ func (ifile *ImportFile) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunctio
 	})
 }
 
+// Returns the blob of data for the file.
 func (ifile *ImportFile) Data() []byte {
 	return ifile.data.Get()
 }
 
-func (ifile *ImportFile) SetData(d []byte) {
+// Sets the blob of data for the file.
+func (ifile *ImportFile) SetData(d []byte) *ImportFile {
 	ifile.data.Set(d)
+	return ifile
 }
 
+// Returns a JSON string specifying the embodiment to use for this primitive.
 func (ifile *ImportFile) Embodiment() string {
 	return ifile.embodiment.Get()
 }
 
-func (ifile *ImportFile) SetEmbodiment(s string) {
+// Sets a JSON string specifying the embodiment to use for this primitive.
+func (ifile *ImportFile) SetEmbodiment(s string) *ImportFile {
 	ifile.embodiment.Set(s)
+	return ifile
 }
 
+// Returns true when the file has been imported by the app side and signals to the server
+// side that file is ready to processs.  This field is normally only updated by the app.
 func (ifile *ImportFile) Imported() bool {
 	return ifile.imported.Get()
 }
 
-func (ifile *ImportFile) SetImported(b bool) {
+// Sets whether the file has been imported by the app side and signals to the server
+// side that file is ready to processs.  This field is normally only updated by the app.
+func (ifile *ImportFile) SetImported(b bool) *ImportFile {
 	ifile.imported.Set(b)
+	return ifile
 }
 
+// Returns the imported file name including its extension separated by a period.
 func (ifile *ImportFile) Name() string {
 	return ifile.name.Get()
 }
 
-func (ifile *ImportFile) SetName(s string) {
+// Sets the imported file name including its extension separated by a period.
+func (ifile *ImportFile) SetName(s string) *ImportFile {
 	ifile.name.Set(s)
+	return ifile
 }
 
+// Returns the valid extensions for importing (non-case sensitive and period separator is omitted).
 func (ifile *ImportFile) ValidExtensions() []string {
 	return ifile.validExtensions.Get()
 }
 
-func (ifile *ImportFile) SetValidExtensions(sa []string) {
+// Sets the valid extensions for importing (non-case sensitive and period separator is omitted).
+func (ifile *ImportFile) SetValidExtensions(sa []string) *ImportFile {
 	ifile.validExtensions.Set(sa)
+	return ifile
 }

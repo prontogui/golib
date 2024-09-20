@@ -13,6 +13,7 @@ import (
 	"github.com/prontogui/golib/key"
 )
 
+// An image for displaying a graphic to display on the screen.  (EXPERIMENTAL)
 type ImageWith struct {
 	Embodiment string
 	Image      []byte
@@ -35,6 +36,7 @@ func (w ImageWith) Make() *Image {
 	return image
 }
 
+// An image for displaying a graphic to display on the screen.  (EXPERIMENTAL)
 type Image struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
@@ -43,6 +45,14 @@ type Image struct {
 	image      BlobField
 }
 
+// Creates a new Image from a file.  (EXPERIMENTAL)
+func NewImage(fromFile string) *Image {
+	return ImageWith{FromFile: fromFile}.Make()
+}
+
+// Prepares the primitive for tracking pending updates to send to the app and
+// for injesting updates from the app.  This is used internally by this library
+// and normally should not be called by users of the library.
 func (image *Image) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 
 	image.InternalPrepareForUpdates(pkey, onset, func() []FieldRef {
@@ -53,20 +63,26 @@ func (image *Image) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 	})
 }
 
+// Returns a JSON string specifying the embodiment to use for this primitive.
 func (image *Image) Embodiment() string {
 	return image.embodiment.Get()
 }
 
-func (image *Image) SetEmbodiment(s string) {
+// Sets a JSON string specifying the embodiment to use for this primitive.
+func (image *Image) SetEmbodiment(s string) *Image {
 	image.embodiment.Set(s)
+	return image
 }
 
+// Returns the binary data for the image
 func (image *Image) Image() []byte {
 	return image.image.Get()
 }
 
-func (image *Image) SetImage(data []byte) {
+// Sets the binary data for the image
+func (image *Image) SetImage(data []byte) *Image {
 	image.image.Set(data)
+	return image
 }
 
 func loadImageFromFile(filePath string) *image.RGBA {

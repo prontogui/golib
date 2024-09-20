@@ -46,6 +46,10 @@ func (tp *TestPrimitive) IngestUpdate(update map[any]any) error {
 	return nil
 }
 
+func (tp *TestPrimitive) String() string {
+	return ""
+}
+
 func generateTestData1D() ([]Primitive, []*TestPrimitive) {
 
 	act1 := &TestPrimitive{s: "abc"}

@@ -174,3 +174,17 @@ func Test_IndexAtLevel2(t *testing.T) {
 		t.Error("Function didn't return an invalid index for level 3.")
 	}
 }
+
+func Test_Len(t *testing.T) {
+
+	testfunc := func(pkey PKey, expecting int) {
+		actual := pkey.Len()
+		if actual != expecting {
+			t.Errorf("Len() returned %d for given PKey.  Expecting %d", actual, expecting)
+		}
+	}
+
+	testfunc(NewPKey(), 0)
+	testfunc(NewPKey(9), 1)
+	testfunc(NewPKey(9, 3, 4), 3)
+}

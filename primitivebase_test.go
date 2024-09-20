@@ -280,3 +280,24 @@ func Test_IngestUpdateNoMatchingFieldInPrimitive(t *testing.T) {
 		t.Fatal("wrong error was returned")
 	}
 }
+
+func Test_IndexOf(t *testing.T) {
+	p := SimplePrimitive{}
+	p.PrepareForUpdates(key.NewPKey(0, 3, 9, 1), nil)
+
+	testfunc := func(level int, expecting int) {
+		actual := p.IndexOf(level)
+
+		if actual != expecting {
+			t.Errorf("Index of %d returned from IndexOf for level %d.  Expecting %d", actual, level, expecting)
+		}
+	}
+
+	testfunc(0, 1)
+	testfunc(1, 9)
+	testfunc(2, 3)
+	testfunc(3, 0)
+	testfunc(4, -1)
+	testfunc(-1, -1)
+	testfunc(-10, -1)
+}

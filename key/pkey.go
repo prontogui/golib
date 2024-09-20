@@ -66,6 +66,10 @@ func (pk PKey) IndexAtLevel(level int) int {
 	return pk[level]
 }
 
+func (pk PKey) Len() int {
+	return len(pk)
+}
+
 type PKeyLocator struct {
 	PKey          PKey
 	LocationLevel int
