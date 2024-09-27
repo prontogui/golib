@@ -136,11 +136,11 @@ func (pgc *PGComm) StreamUpdates(stream pb.PGService_StreamUpdatesServer) error 
 		return errors.New("busy streaming updates to another app")
 	}
 
-	// Launch a Go routine to stream mutations back to caller
+	// Launch a Go routine to stream updates back to caller
 	cancel := make(chan bool)
 	go pgc.streamOutboundUpdates(pgc.streamingSessionId, cancel, stream)
 
-	// Receive mutations and process them
+	// Receive updates and process them
 	var err error
 
 	// Loop for every inbound update received...

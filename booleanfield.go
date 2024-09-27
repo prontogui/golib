@@ -15,10 +15,6 @@ type BooleanField struct {
 	b bool
 }
 
-func (f *BooleanField) GetAsAny() any {
-	return f.b
-}
-
 func (f *BooleanField) Get() bool {
 	return f.b
 }

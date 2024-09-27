@@ -74,6 +74,8 @@ func (pg *_ProntoGUI) Wait() (updatedPrimitive Primitive, waitError error) {
 		return nil, errors.New("no GUI has been set")
 	}
 
+	updateEventTimestamp()
+
 	var updateOut []byte
 	var updateIn []byte
 

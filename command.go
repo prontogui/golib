@@ -35,15 +35,19 @@ type Command struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
 
-	embodiment StringField
-	label      StringField
-	status     IntegerField
-	tag        StringField
+	commandIssued EventField
+	embodiment    StringField
+	label         StringField
+	status        IntegerField
+	tag           StringField
 }
 
 // Creates a new command and assigns a label.
 func NewCommand(label string) *Command {
-	return CommandWith{Label: label}.Make()
+	cmd := CommandWith{Label: label}.Make()
+	// Must initialize the CommandIssued field
+	cmd.commandIssued.TimestampProvider = getEventTimestamp
+	return cmd
 }
 
 // Prepares the primitive for tracking pending updates to send to the app and

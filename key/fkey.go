@@ -18,6 +18,7 @@ const (
 	FKey_Checked
 	FKey_Choice
 	FKey_Choices
+	FKey_CommandIssued
 	FKey_Content
 	FKey_Data
 	FKey_Embodiment
@@ -58,6 +59,7 @@ func init() {
 	_fkeyToName[FKey_Checked] = "Checked"
 	_fkeyToName[FKey_Choice] = "Choice"
 	_fkeyToName[FKey_Choices] = "Choices"
+	_fkeyToName[FKey_CommandIssued] = "CommandIssued"
 	_fkeyToName[FKey_Content] = "Content"
 	_fkeyToName[FKey_Data] = "Data"
 	_fkeyToName[FKey_Embodiment] = "Embodiment"
