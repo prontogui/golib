@@ -57,6 +57,7 @@ func (cmd *Command) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 
 	cmd.InternalPrepareForUpdates(pkey, onset, func() []FieldRef {
 		return []FieldRef{
+			{key.FKey_CommandIssued, &cmd.commandIssued},
 			{key.FKey_Embodiment, &cmd.embodiment},
 			{key.FKey_Label, &cmd.label},
 			{key.FKey_Status, &cmd.status},
@@ -69,6 +70,11 @@ func (cmd *Command) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 // Implements of fmt:Stringer interface.
 func (cmd *Command) String() string {
 	return cmd.label.Get()
+}
+
+// Returns true if the command was issued during the current Wait cycle.
+func (cmd *Command) CommandIssued() bool {
+	return cmd.commandIssued.Issued()
 }
 
 // Returns a JSON string specifying the embodiment to use for this primitive.
