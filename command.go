@@ -21,10 +21,16 @@ type CommandWith struct {
 // Makes a new Command with specified field values.
 func (w CommandWith) Make() *Command {
 	cmd := &Command{}
+
+	// Must initialize the CommandIssued field
+	cmd.commandIssued.TimestampProvider = getEventTimestamp
+
+	// Set fields
 	cmd.embodiment.Set(w.Embodiment)
 	cmd.label.Set(w.Label)
 	cmd.status.Set(w.Status)
 	cmd.tag.Set(w.Tag)
+
 	return cmd
 }
 
@@ -45,8 +51,6 @@ type Command struct {
 // Creates a new command and assigns a label.
 func NewCommand(label string) *Command {
 	cmd := CommandWith{Label: label}.Make()
-	// Must initialize the CommandIssued field
-	cmd.commandIssued.TimestampProvider = getEventTimestamp
 	return cmd
 }
 
