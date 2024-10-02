@@ -11,6 +11,20 @@ import (
 	"github.com/prontogui/golib/key"
 )
 
+func Test_EventNotIssued0(t *testing.T) {
+
+	var ts time.Time
+
+	f := EventField{}
+	f.TimestampProvider = func() time.Time {
+		return ts
+	}
+
+	if f.Issued() {
+		t.Fatal("EventField shows the event as issued.  Expecting it to be not issued.")
+	}
+}
+
 func Test_EventNotIssued1(t *testing.T) {
 
 	ts := time.Now()

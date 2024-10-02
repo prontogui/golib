@@ -35,6 +35,9 @@ import (
 type EventField struct {
 	FieldBase
 
+	// A valid timestamp has been saved.
+	validTimestamp bool
+
 	// The timestamp returned from provider at the last time a value was injested.
 	// This is used to know if a value was injested during the current Wait cycle.
 	eventTimestamp time.Time
@@ -53,6 +56,10 @@ func (f *EventField) _checkMissingFunc() {
 // Returns true if the event was assigned during the current Wait cycle, as determined from the
 // timestamp provider.
 func (f *EventField) Issued() bool {
+	if !f.validTimestamp {
+		return false
+	}
+
 	f._checkMissingFunc()
 
 	// Was a new value injested during the current event cycle?
@@ -70,6 +77,7 @@ func (f *EventField) EgestValue() any {
 
 func (f *EventField) IngestValue(value any) error {
 	f._checkMissingFunc()
+	f.validTimestamp = true
 	f.eventTimestamp = f.TimestampProvider()
 	return nil
 }
