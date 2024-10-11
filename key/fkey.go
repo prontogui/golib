@@ -39,8 +39,6 @@ const (
 	FKey_State
 	FKey_Status
 	FKey_Tag
-	FKey_TemplateItem
-	FKey_TemplateRow
 	FKey_TextEntry
 	FKey_ValidExtensions
 
@@ -80,8 +78,6 @@ func init() {
 	_fkeyToName[FKey_State] = "State"
 	_fkeyToName[FKey_Status] = "Status"
 	_fkeyToName[FKey_Tag] = "Tag"
-	_fkeyToName[FKey_TemplateItem] = "TemplateItem"
-	_fkeyToName[FKey_TemplateRow] = "TemplateRow"
 	_fkeyToName[FKey_TextEntry] = "TextEntry"
 	_fkeyToName[FKey_ValidExtensions] = "ValidExtensions"
 

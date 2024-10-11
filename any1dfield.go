@@ -38,6 +38,11 @@ func (f *Any1DField) Set(ary []Primitive) {
 	f.OnSet(true)
 }
 
+// Convenience function that returns the length of the array.
+func (f *Any1DField) Length() int {
+	return len(f.ary)
+}
+
 func (f *Any1DField) PrepareForUpdates(fkey key.FKey, pkey key.PKey, fieldPKeyIndex int, onset key.OnSetFunction) (isContainer bool) {
 	f.StashUpdateInfo(fkey, pkey, fieldPKeyIndex, onset)
 	f.prepareDescendantsForUpdate()

@@ -13,16 +13,15 @@ import (
 func Test_ListAttachedFields(t *testing.T) {
 	list := &List{}
 	list.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, list.PrimitiveBase, "Embodiment", "ListItems", "Selected", "Tag", "TemplateItem")
+	verifyAllFieldsAttached(t, list.PrimitiveBase, "Embodiment", "ListItems", "Selected", "Tag")
 }
 
 func Test_ListMake(t *testing.T) {
 	list := ListWith{
-		Embodiment:   "scrolling",
-		ListItems:    []Primitive{&Command{}, &Command{}},
-		Selected:     1,
-		Tag:          "F",
-		TemplateItem: &Command{},
+		Embodiment: "scrolling",
+		ListItems:  []Primitive{&Command{}, &Command{}},
+		Selected:   1,
+		Tag:        "F",
 	}.Make()
 
 	if list.Embodiment() != "scrolling" {
@@ -40,12 +39,6 @@ func Test_ListMake(t *testing.T) {
 	if list.Tag() != "F" {
 		t.Error("Tag field was not initialized correctly")
 	}
-
-	_, ok := list.TemplateItem().(*Command)
-	if !ok {
-		t.Error("TemplateItem is not initialized properly")
-	}
-
 }
 
 func Test_ListFieldSettings(t *testing.T) {
@@ -118,15 +111,6 @@ func Test_ListFieldSettings(t *testing.T) {
 	if list.Tag() != "ABC" {
 		t.Error("unable to set Tag field")
 	}
-
-	// TemplateItem field tests
-	list.SetTemplateItem(&Text{})
-
-	_, ok := list.TemplateItem().(*Text)
-
-	if !ok {
-		t.Error("Unable to set template item to a Text primitive")
-	}
 }
 
 func Test_ListGetChildPrimitive(t *testing.T) {
@@ -135,10 +119,8 @@ func Test_ListGetChildPrimitive(t *testing.T) {
 
 	cmd1 := CommandWith{Label: "a"}.Make()
 	cmd2 := CommandWith{Label: "b"}.Make()
-	cmd3 := CommandWith{Label: "c"}.Make()
 
 	list.SetListItemsVA(cmd1, cmd2)
-	list.SetTemplateItem(cmd3)
 
 	locate := func(pkey key.PKey) *Command {
 		locator := key.NewPKeyLocator(pkey)
@@ -151,9 +133,5 @@ func Test_ListGetChildPrimitive(t *testing.T) {
 
 	if locate(key.NewPKey(0, 1)).Label() != "b" {
 		t.Fatal("LocateNextDescendant doesn't return a child for pkey 0, 1.")
-	}
-
-	if locate(key.NewPKey(1)).Label() != "c" {
-		t.Fatal("LocateNextDescendant doesn't return a child for pkey 1. ")
 	}
 }

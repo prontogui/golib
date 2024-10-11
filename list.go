@@ -11,11 +11,10 @@ import (
 // A list is a collection of primitives that have a sequential-like relationship
 // and might be dynamic in quantity or kind.
 type ListWith struct {
-	Embodiment   string
-	ListItems    []Primitive
-	Selected     int
-	Tag          string
-	TemplateItem Primitive
+	Embodiment string
+	ListItems  []Primitive
+	Selected   int
+	Tag        string
 }
 
 // Creates a new List using the supplied field assignments.
@@ -25,7 +24,6 @@ func (w ListWith) Make() *List {
 	list.listItems.Set(w.ListItems)
 	list.selected.Set(w.Selected)
 	list.tag.Set(w.Tag)
-	list.templateItem.Set(w.TemplateItem)
 	return list
 }
 
@@ -35,11 +33,10 @@ type List struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
 
-	embodiment   StringField
-	listItems    Any1DField
-	selected     IntegerField
-	tag          StringField
-	templateItem AnyField
+	embodiment StringField
+	listItems  Any1DField
+	selected   IntegerField
+	tag        StringField
 }
 
 // Creates a new List and assigns items.
@@ -58,7 +55,6 @@ func (list *List) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_ListItems, &list.listItems},
 			{key.FKey_Selected, &list.selected},
 			{key.FKey_Tag, &list.tag},
-			{key.FKey_TemplateItem, &list.templateItem},
 		}
 	})
 }
@@ -74,8 +70,6 @@ func (list *List) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
 	switch nextIndex {
 	case 0:
 		return list.ListItems()[locator.NextIndex()]
-	case 1:
-		return list.TemplateItem()
 	default:
 		panic("cannot locate descendent using a pkey that we assumed was valid")
 	}
@@ -117,17 +111,6 @@ func (list *List) Selected() int {
 // Sets the currently selected item or -1 for none selected.
 func (list *List) SetSelected(selected int) *List {
 	list.selected.Set(selected)
-	return list
-}
-
-// Returns the template for how each item in the list should look, feel, and behave.
-func (list *List) TemplateItem() Primitive {
-	return list.templateItem.Get()
-}
-
-// Sets the template for how each item in the list should look, feel, and behave.
-func (list *List) SetTemplateItem(item Primitive) *List {
-	list.templateItem.Set(item)
 	return list
 }
 

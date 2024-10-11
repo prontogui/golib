@@ -14,17 +14,16 @@ import (
 func Test_TableAttachedFields(t *testing.T) {
 	table := &Table{}
 	table.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, table.PrimitiveBase, "Embodiment", "Headings", "Rows", "Status", "Tag", "TemplateRow")
+	verifyAllFieldsAttached(t, table.PrimitiveBase, "Embodiment", "Headings", "Rows", "Status", "Tag")
 }
 
 func Test_TableMake(t *testing.T) {
 	table := TableWith{
-		Embodiment:  "paginated",
-		Headings:    []string{"H1", "H2"},
-		Rows:        [][]Primitive{{&Command{}, &Command{}}, {&Command{}, &Command{}}},
-		Status:      2,
-		Tag:         "F",
-		TemplateRow: []Primitive{&Command{}, &Command{}},
+		Embodiment: "paginated",
+		Headings:   []string{"H1", "H2"},
+		Rows:       [][]Primitive{{&Command{}, &Command{}}, {&Command{}, &Command{}}},
+		Status:     2,
+		Tag:        "F",
 	}.Make()
 
 	if table.Embodiment() != "paginated" {
@@ -53,10 +52,6 @@ func Test_TableMake(t *testing.T) {
 
 	if table.Tag() != "F" {
 		t.Error("'Tag' field was not initialized correctly")
-	}
-
-	if len(table.TemplateRow()) != 2 {
-		t.Error("'Rows' field was not initialized correctly")
 	}
 }
 
@@ -115,21 +110,6 @@ func Test_TableFieldSettings(t *testing.T) {
 	if table.Tag() != "ABC" {
 		t.Error("unable to set the Tag field.")
 	}
-
-	// TemplateRow field tests
-	table.SetTemplateRow([]Primitive{&Text{}, &Command{}})
-
-	_, ok = table.TemplateRow()[0].(*Text)
-
-	if !ok {
-		t.Error("Unable to set template item to a Text primitive")
-	}
-
-	_, ok = table.TemplateRow()[1].(*Command)
-
-	if !ok {
-		t.Error("Unable to set template item to a Command primitive")
-	}
 }
 
 func Test_TableGetChildPrimitive(t *testing.T) {
@@ -140,11 +120,8 @@ func Test_TableGetChildPrimitive(t *testing.T) {
 	cmdr0c1 := CommandWith{Label: "r0c1"}.Make()
 	cmdr1c0 := CommandWith{Label: "r1c0"}.Make()
 	cmdr1c1 := CommandWith{Label: "r1c1"}.Make()
-	cmdtr0 := CommandWith{Label: "a"}.Make()
-	cmdtr1 := CommandWith{Label: "b"}.Make()
 
 	table.SetRows([][]Primitive{{cmdr0c0, cmdr0c1}, {cmdr1c0, cmdr1c1}})
-	table.SetTemplateRow([]Primitive{cmdtr0, cmdtr1})
 
 	locate := func(pkey key.PKey) *Command {
 		locator := key.NewPKeyLocator(pkey)
@@ -166,14 +143,6 @@ func Test_TableGetChildPrimitive(t *testing.T) {
 	if locate(key.NewPKey(0, 1, 1)).Label() != "r1c1" {
 		t.Fatal("LocateNextDescendant doesn't return a child for pkey 0, 1, 1.")
 	}
-
-	if locate(key.NewPKey(1, 0)).Label() != "a" {
-		t.Fatal("LocateNextDescendant doesn't return a child for pkey 1, 0.")
-	}
-
-	if locate(key.NewPKey(1, 1)).Label() != "b" {
-		t.Fatal("LocateNextDescendant doesn't return a child for pkey 1, 1.")
-	}
 }
 
 func _prepareTableForInsert() *Table {
@@ -187,7 +156,6 @@ func _prepareTableForInsert() *Table {
 	r2c1 := TextWith{Content: "r2c1"}.Make()
 
 	table.SetRows([][]Primitive{{r0c0, r0c1}, {r1c0, r1c1}, {r2c0, r2c1}})
-	table.SetTemplateRow([]Primitive{r0c0, r0c1})
 
 	return table
 }

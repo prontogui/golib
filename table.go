@@ -13,12 +13,11 @@ import (
 
 // A table displays an array of primitives in a grid of rows and columns.
 type TableWith struct {
-	Embodiment  string
-	Headings    []string
-	Rows        [][]Primitive
-	Status      int
-	Tag         string
-	TemplateRow []Primitive
+	Embodiment string
+	Headings   []string
+	Rows       [][]Primitive
+	Status     int
+	Tag        string
 }
 
 // Creates a new Table using the supplied field assignments.
@@ -29,7 +28,6 @@ func (w TableWith) Make() *Table {
 	table.rows.Set(w.Rows)
 	table.status.Set(w.Status)
 	table.tag.Set(w.Tag)
-	table.templateRow.Set(w.TemplateRow)
 	return table
 }
 
@@ -38,12 +36,11 @@ type Table struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
 
-	embodiment  StringField
-	headings    Strings1DField
-	rows        Any2DField
-	status      IntegerField
-	tag         StringField
-	templateRow Any1DField
+	embodiment StringField
+	headings   Strings1DField
+	rows       Any2DField
+	status     IntegerField
+	tag        StringField
 }
 
 // Creates a new Table with headings.
@@ -63,7 +60,6 @@ func (table *Table) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_Rows, &table.rows},
 			{key.FKey_Status, &table.status},
 			{key.FKey_Tag, &table.tag},
-			{key.FKey_TemplateRow, &table.templateRow},
 		}
 	})
 }
@@ -83,8 +79,6 @@ func (table *Table) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
 		row := locator.NextIndex()
 		col := locator.NextIndex()
 		return table.Rows()[row][col]
-	case 1:
-		return table.TemplateRow()[locator.NextIndex()]
 	default:
 		panic("cannot locate descendent using a pkey that we assumed was valid")
 	}
@@ -150,17 +144,6 @@ func (table *Table) Tag() string {
 // identification later on, such as using Tables inside other containers.
 func (table *Table) SetTag(s string) *Table {
 	table.tag.Set(s)
-	return table
-}
-
-// Returns the template for how each row should look, feel, and behave.
-func (table *Table) TemplateRow() []Primitive {
-	return table.templateRow.Get()
-}
-
-// Sets the template for how each row should look, feel, and behave.
-func (table *Table) SetTemplateRow(items []Primitive) *Table {
-	table.templateRow.Set(items)
 	return table
 }
 

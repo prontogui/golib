@@ -48,6 +48,11 @@ func (f *Any2DField) Set(ary [][]Primitive) {
 	f.OnSet(true)
 }
 
+// Convenience function that returns the length of the array in rows.
+func (f *Any2DField) Length() int {
+	return len(f.ary)
+}
+
 func (f *Any2DField) PrepareForUpdates(fkey key.FKey, pkey key.PKey, fieldPKeyIndex int, onset key.OnSetFunction) (isContainer bool) {
 	f.StashUpdateInfo(fkey, pkey, fieldPKeyIndex, onset)
 	f.prepareDescendantsForUpdate()
