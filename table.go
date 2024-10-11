@@ -175,3 +175,8 @@ func (table *Table) DeleteRow(index int) error {
 
 	return nil
 }
+
+// Convenience function that returns the number of rows.
+func (table *Table) RowCount() int {
+	return table.rows.Length()
+}
