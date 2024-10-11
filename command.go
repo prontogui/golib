@@ -77,7 +77,7 @@ func (cmd *Command) String() string {
 }
 
 // Returns true if the command was issued during the current Wait cycle.
-func (cmd *Command) CommandIssued() bool {
+func (cmd *Command) Issued() bool {
 	return cmd.commandIssued.Issued()
 }
 
