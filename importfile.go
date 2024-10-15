@@ -65,15 +65,25 @@ func (ifile *ImportFile) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunctio
 	})
 }
 
-// Returns the blob of data for the file.
+// Returns the blob of data for the file.  Note:  this data could be empty and
+// yet represent a valid imported, albeit empty, file.  Therefore, it is important to
+// look at Imported() field to know whether data has been imported.  Conversely,
+// if the Imported() function returns false then this will return an empty array.
 func (ifile *ImportFile) Data() []byte {
 	return ifile.data.Get()
 }
 
-// Sets the blob of data for the file.
-func (ifile *ImportFile) SetData(d []byte) *ImportFile {
+// Sets the blob of data for the file and sets imported flag to true.
+func (ifile *ImportFile) ImportData(d []byte) *ImportFile {
 	ifile.data.Set(d)
+	ifile.imported.Set(true)
 	return ifile
+}
+
+// Clears the imported data and the imported flag.
+func (ifile *ImportFile) Reset() {
+	ifile.data.Set([]byte{})
+	ifile.imported.Set(false)
 }
 
 // Returns a JSON string specifying the embodiment to use for this primitive.

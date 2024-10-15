@@ -60,3 +60,20 @@ func Test_ExportFileFieldSetting(t *testing.T) {
 		t.Error("could not set Tag field")
 	}
 }
+
+func Test_ExportReset(t *testing.T) {
+	ef := &ExportFile{}
+	ef.PrepareForUpdates(key.NewPKey(), nil)
+
+	ef.SetData([]byte{1, 2, 3})
+	ef.SetExported(true)
+	ef.Reset()
+
+	if len(ef.Data()) != 0 {
+		t.Error("data wasn't cleared")
+	}
+
+	if ef.Exported() != false {
+		t.Error("exported flag wasn't set to false")
+	}
+}

@@ -65,15 +65,22 @@ func (ef *ExportFile) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) 
 	})
 }
 
-// Returns the blob of data representing the binary contents of the file.
+// Returns the blob of data representing the binary contents of the file.  Note:  this
+// data could be empty and yet represent a valid, albeit empty, file for export.
 func (ef *ExportFile) Data() []byte {
 	return ef.data.Get()
 }
 
-// Sets the blob of data representing the binary contents of the file.
+// Sets the blob of data representing the binary contents of the file to export.
 func (ef *ExportFile) SetData(d []byte) *ExportFile {
 	ef.data.Set(d)
 	return ef
+}
+
+// Clears the exported data and the exported flag.
+func (ef *ExportFile) Reset() {
+	ef.data.Set([]byte{})
+	ef.exported.Set(false)
 }
 
 // Returns a JSON string specifying the embodiment to use for this primitive.

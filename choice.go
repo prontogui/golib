@@ -38,8 +38,8 @@ type Choice struct {
 }
 
 // Creates a new Choice and assigns the initiali Choice and Choices fields.
-func NewChoice(choice string, choices []string) *Choice {
-	return ChoiceWith{Choice: choice, Choices: choices}.Make()
+func NewChoice(choices ...string) *Choice {
+	return ChoiceWith{Choices: choices}.Make().SetChoiceIndex(0)
 }
 
 // Prepares the primitive for tracking pending updates to send to the app and
@@ -112,5 +112,35 @@ func (choice *Choice) Tag() string {
 // identification later on, such as using Choices as Table cells.
 func (choice *Choice) SetTag(s string) *Choice {
 	choice.tag.Set(s)
+	return choice
+}
+
+// Returns the index (0, 1, ..) of selected choice or -1 if choice is empty.  This is a covenvenience
+// function as an alternative to Choice().  The canonical storage of choice remains a string.
+func (choice *Choice) ChoiceIndex() int {
+	currentChoice := choice.choice.Get()
+
+	for index, choice := range choice.choices.Get() {
+		if choice == currentChoice {
+			return index
+		}
+	}
+	return -1
+}
+
+// Sets the selected choice or empty if none chosen or if index is out of range.
+// This is a covenvenience function as an alternative to SetChoice().  The canonical storage of
+// choice remains a string.
+func (choice *Choice) SetChoiceIndex(index int) *Choice {
+
+	currentChoices := choice.choices.Get()
+
+	// Valid index?
+	if index >= 0 && index < len(currentChoices) {
+		choice.choice.Set(currentChoices[index])
+	} else {
+		choice.choice.Set("")
+	}
+
 	return choice
 }

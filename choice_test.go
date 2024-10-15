@@ -71,3 +71,47 @@ func Test_ChoiceFieldSettings(t *testing.T) {
 		t.Error("Could not set Tag field.")
 	}
 }
+
+func Test_ChoiceSetIndex(t *testing.T) {
+
+	testFunc := func(index int, expectedChoice string) {
+		choice := NewChoice("Apple", "Orange", "Peach")
+
+		if choice.SetChoiceIndex(0) != choice {
+			t.Error("SetChoiceIndex didn't return a reference to choice.")
+		}
+
+		actualChoice := choice.Choice()
+
+		if actualChoice != "Apple" {
+			t.Errorf("Returned Choice = %s for index = %d.  Expecting Choice to be %s", actualChoice, index, expectedChoice)
+		}
+	}
+
+	// Test cases...
+	testFunc(0, "Apple")
+	testFunc(1, "Orange")
+	testFunc(2, "Peach")
+	testFunc(-1, "")
+	testFunc(3, "")
+}
+
+func Test_ChoiceIndex(t *testing.T) {
+
+	testFunc := func(setChoice string, expectedIndex int) {
+		choice := NewChoice("Apple", "Orange", "Peach")
+
+		choice.SetChoice(setChoice)
+		actualIndex := choice.ChoiceIndex()
+
+		if actualIndex != expectedIndex {
+			t.Errorf("ChoiceIndex returned %d.  Expecting %d.", actualIndex, expectedIndex)
+		}
+	}
+
+	// Test cases...
+	testFunc("Apple", 0)
+	testFunc("Orange", 1)
+	testFunc("Peach", 2)
+	testFunc("", -1)
+}

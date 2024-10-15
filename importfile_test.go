@@ -50,9 +50,13 @@ func Test_ImporttFileFieldSetting(t *testing.T) {
 	impf := &ImportFile{}
 	impf.PrepareForUpdates(key.NewPKey(), nil)
 
-	impf.SetData([]byte{1, 2, 3})
+	impf.ImportData([]byte{1, 2, 3})
 	if len(impf.Data()) != 3 {
 		t.Error("could not set Data field")
+	}
+
+	if impf.Imported() != true {
+		t.Error("Imported() doesn't return true")
 	}
 
 	impf.SetEmbodiment("sleek")
@@ -73,5 +77,21 @@ func Test_ImporttFileFieldSetting(t *testing.T) {
 	impf.SetValidExtensions([]string{"TXT", "CSV"})
 	if len(impf.ValidExtensions()) != 2 || impf.ValidExtensions()[0] != "TXT" || impf.ValidExtensions()[1] != "CSV" {
 		t.Error("could not initialize ValidExtensions field")
+	}
+}
+
+func Test_ImportReset(t *testing.T) {
+	impf := &ImportFile{}
+	impf.PrepareForUpdates(key.NewPKey(), nil)
+
+	impf.ImportData([]byte{1, 2, 3})
+	impf.Reset()
+
+	if len(impf.Data()) != 0 {
+		t.Error("data wasn't cleared")
+	}
+
+	if impf.Imported() != false {
+		t.Error("imported flag wasn't set to false")
 	}
 }
