@@ -180,3 +180,7 @@ func (table *Table) DeleteRow(index int) error {
 func (table *Table) RowCount() int {
 	return table.rows.Length()
 }
+
+func (table *Table) DeleteAllRows() {
+	table.rows.Set([][]Primitive{})
+}

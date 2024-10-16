@@ -295,3 +295,13 @@ func Test_TableDeleteRow4(t *testing.T) {
 		t.Fatal("unexpected error returned")
 	}
 }
+
+func Test_TableDeleteAllRows(t *testing.T) {
+	table := _prepareTableForInsert()
+
+	table.DeleteAllRows()
+
+	if len(table.Rows()) != 0 {
+		t.Fatalf("number of rows after deletion is: %d. Expecting 0.", len(table.Rows()))
+	}
+}
