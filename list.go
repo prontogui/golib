@@ -126,3 +126,14 @@ func (list *List) SetTag(s string) *List {
 	list.tag.Set(s)
 	return list
 }
+
+// SelectedItem returns the currently selected item from the list.
+// If the selected index is within the valid range of list items, it returns the item at the selected index.
+// If the selected index is out of range, it returns nil.
+func (list *List) SelectedItem() Primitive {
+	selected := list.Selected()
+	if selected >= 0 && selected < len(list.ListItems()) {
+		return list.ListItems()[selected]
+	}
+	return nil
+}

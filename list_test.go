@@ -135,3 +135,33 @@ func Test_ListGetChildPrimitive(t *testing.T) {
 		t.Fatal("LocateNextDescendant doesn't return a child for pkey 0, 1.")
 	}
 }
+func Test_ListSelectedItem(t *testing.T) {
+	list := &List{}
+
+	// Test when no item is selected
+	list.SetSelected(-1)
+	if list.SelectedItem() != nil {
+		t.Error("Expected nil when no item is selected")
+	}
+
+	// Test when selected index is out of range
+	list.SetListItems([]Primitive{&Command{}, &Command{}})
+	list.SetSelected(2)
+	if list.SelectedItem() != nil {
+		t.Error("Expected nil when selected index is out of range")
+	}
+
+	// Test when selected index is within range
+	list.SetSelected(1)
+	if list.SelectedItem() == nil {
+		t.Error("Expected a valid item when selected index is within range")
+	}
+
+	// Verify the selected item is correct
+	cmd := &Command{}
+	list.SetListItems([]Primitive{&Command{}, cmd})
+	list.SetSelected(1)
+	if list.SelectedItem() != cmd {
+		t.Error("SelectedItem did not return the correct item")
+	}
+}
