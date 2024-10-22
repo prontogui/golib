@@ -86,12 +86,12 @@ func (pgc *PGComm) streamOutboundUpdates(sessionId int8, cancel chan bool, strea
 	}
 }
 
-// Sends an update (as CBOR) to the app and waits for an update to come back.
+// Sends an update (as CBOR) to the app and optionally waits for an update to come back.
 //
 // If successful, this returns an incoming update (which could be empty) and nil for error.
 // If the streaming session was re-established then nil is returned for the update and nil for error.
 // If an error occurred then an error is returned along with nil for the update.
-func (pgc *PGComm) ExchangeUpdates(updateCbor []byte) ([]byte, error) {
+func (pgc *PGComm) ExchangeUpdates(updateCbor []byte, noWait bool) ([]byte, error) {
 
 	// Build an new update using session # and bytes
 	updateOut := UpdatePackage{sessionId: pgc.exchangeSessionId, cbor: updateCbor}
@@ -99,22 +99,44 @@ func (pgc *PGComm) ExchangeUpdates(updateCbor []byte) ([]byte, error) {
 	// Queue the update to be streamed to app
 	pgc.outboundUpdates <- updateOut
 
-	select {
-	case pgc.exchangeSessionId = <-pgc.newSessionId:
-		return nil, nil
-	case updateIn, ok := <-pgc.inboundUpdates:
-		if !ok {
-			return nil, errors.New("inboundUpdates channel is invalid")
-		}
+	var updateIn UpdatePackage
+	var ok bool
 
-		// Ignore if sessionId of incoming update doesn't match
-		// (This case may not happen in practice but, for logical reasons, we'll treat it just in case.)
-		if updateIn.sessionId != pgc.exchangeSessionId {
+	if noWait {
+		select {
+		case pgc.exchangeSessionId = <-pgc.newSessionId:
+			goto case_new_session
+		case updateIn, ok = <-pgc.inboundUpdates:
+			goto case_inbound_update
+		default:
+			// No update available, return immediately
 			return nil, nil
 		}
 
-		return updateIn.cbor, nil
+	} else {
+		select {
+		case pgc.exchangeSessionId = <-pgc.newSessionId:
+			goto case_new_session
+		case updateIn, ok = <-pgc.inboundUpdates:
+			goto case_inbound_update
+		}
 	}
+
+case_new_session:
+	return nil, nil
+
+case_inbound_update:
+	if !ok {
+		return nil, errors.New("inboundUpdates channel is invalid")
+	}
+
+	// Ignore if sessionId of incoming update doesn't match
+	// (This case may not happen in practice but, for logical reasons, we'll treat it just in case.)
+	if updateIn.sessionId != pgc.exchangeSessionId {
+		return nil, nil
+	}
+
+	return updateIn.cbor, nil
 }
 
 // Implementation of PGServer.StreamUpdates API call.

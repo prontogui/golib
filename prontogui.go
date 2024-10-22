@@ -65,39 +65,77 @@ func (pg *_ProntoGUI) SetGUI(primitives ...Primitive) {
 	pg.synchro.SetTopPrimitives(primitives...)
 }
 
-// Sends model updates to the app for rendering, waits for an event to occured in the app that requires server attention,
+// Sends model updates to the app for rendering, waits for an event to occur in the app that requires server attention,
 // and receives model updates from the app.  This function returns the primitive that ended triggered the event that ended
 // the wait period.  An error is returend if something went wrong.
-func (pg *_ProntoGUI) Wait() (updatedPrimitive Primitive, waitError error) {
+func (pg *_ProntoGUI) Wait() (Primitive, error) {
 
+	updateOut, err := pg.verifyGuiIsSetThenGetNextUpdate()
+	if err != nil {
+		return nil, err
+	}
+
+	// Exchange updates and wait until App has an update.
+	updateIn, err := pg.pgcomm.ExchangeUpdates(updateOut, false)
+	if updateIn == nil || err != nil {
+		// Require a full update the next time around
+		pg.fullupdate = true
+		return nil, err
+	}
+
+	// Update the time stamp for recognizing events such as CommandIssued.  This must be called for
+	// every update received from the app.
+	updateEventTimestamp()
+
+	// Ingest the update and return the primitive that triggered the event or an error if something went wrong
+	return pg.synchro.IngestUpdate(updateIn)
+}
+
+// Sends model updates to the app for rendering.  If an event occured in the app that requires server attention,
+// it receives the model updates from the app returns the primitive that ended triggered the event.  An error is
+// returend if something went wrong.
+func (pg *_ProntoGUI) Update() (Primitive, error) {
+
+	updateOut, err := pg.verifyGuiIsSetThenGetNextUpdate()
+	if err != nil {
+		return nil, err
+	}
+
+	// Exchange updates but don't wait if nothing available from the App
+	updateIn, err := pg.pgcomm.ExchangeUpdates(updateOut, true)
+
+	if err != nil {
+		// Require a full update the next time around
+		pg.fullupdate = true
+		return nil, err
+	}
+
+	// No update available, return immediately
+	if updateIn == nil {
+		return nil, nil
+	}
+
+	// Update the time stamp for recognizing events such as CommandIssued.  This must be called for
+	// every update received from the app.
+	updateEventTimestamp()
+
+	// Ingest the update and return the primitive that triggered the event or an error if something went wrong
+	return pg.synchro.IngestUpdate(updateIn)
+}
+
+// Verifies that a GUI has been set and then gets the next update to send to the app.
+func (pg *_ProntoGUI) verifyGuiIsSetThenGetNextUpdate() ([]byte, error) {
 	if !pg.isgui {
 		return nil, errors.New("no GUI has been set")
 	}
 
-	updateEventTimestamp()
-
-	var updateOut []byte
-	var updateIn []byte
-
 	// Need to send a full update?
 	if pg.fullupdate {
-		updateOut, waitError = pg.synchro.GetFullUpdate()
 		pg.fullupdate = false
+		return pg.synchro.GetFullUpdate()
 	} else {
-		updateOut, waitError = pg.synchro.GetPartialUpdate()
+		return pg.synchro.GetPartialUpdate()
 	}
-	if waitError != nil {
-		return
-	}
-
-	updateIn, waitError = pg.pgcomm.ExchangeUpdates(updateOut)
-	if updateIn == nil || waitError != nil {
-		// Require a full update the next time around
-		pg.fullupdate = true
-		return
-	}
-
-	return pg.synchro.IngestUpdate(updateIn)
 }
 
 // Creates a new ProntoGUI instance.
