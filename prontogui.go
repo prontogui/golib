@@ -15,7 +15,8 @@ type ProntoGUI interface {
 	StartServing(addr string, port int) error
 	StopServing()
 	SetGUI(primitives ...Primitive)
-	Wait() (updatedPrimitive Primitive, waitError error)
+	Update() (Primitive, error)
+	Wait() (Primitive, error)
 }
 
 // Internal data for handling the API of this library
