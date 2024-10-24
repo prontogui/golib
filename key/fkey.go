@@ -14,8 +14,7 @@ const (
 const (
 
 	// ADD NEW FIELDS TO THIS BLOCK - ALPHABETICAL ORDER PLEASE!
-	FKey_Changed FKey = iota
-	FKey_Checked
+	FKey_Checked FKey = iota
 	FKey_Choice
 	FKey_Choices
 	FKey_CommandIssued
@@ -53,7 +52,6 @@ func init() {
 	_fkeyToName = make([]string, FKey_MAXIMUMKEYS)
 
 	// ADD NEW FIELDS TO THIS BLOCK - ALPHABETICAL ORDER PLEASE!
-	_fkeyToName[FKey_Changed] = "Changed"
 	_fkeyToName[FKey_Checked] = "Checked"
 	_fkeyToName[FKey_Choice] = "Choice"
 	_fkeyToName[FKey_Choices] = "Choices"
