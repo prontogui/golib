@@ -27,7 +27,7 @@ func (f *FieldBase) StashUpdateInfo(fkey key.FKey, pkey key.PKey, fieldPKeyIndex
 	f.fkey = fkey
 	f.pkey = pkey
 	f.onset = onset
-	fieldPKeyIndex = fieldPKeyIndex
+	f.fieldPKeyIndex = fieldPKeyIndex
 }
 
 func (f *FieldBase) OnSet(structural bool) {
