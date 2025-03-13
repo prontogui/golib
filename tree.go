@@ -63,6 +63,20 @@ func (tree *Tree) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 	})
 }
 
+// A non-recursive method to locate descendants by PKey.  This is used internally by this library
+// and normally should not be called by users of the library.
+func (tree *Tree) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
+	nextIndex := locator.NextIndex()
+	switch nextIndex {
+	case 0:
+		return tree.ModelItem()
+	case 1:
+		return tree.Root()
+	}
+
+	panic("cannot locate descendent using a pkey that we assumed was valid")
+}
+
 // Returns a string representation of this primitive.
 // Implements of fmt:Stringer interface.
 func (tree *Tree) String() string {

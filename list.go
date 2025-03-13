@@ -13,6 +13,7 @@ import (
 type ListWith struct {
 	Embodiment    string
 	ListItems     []Primitive
+	ModelItem     Primitive
 	SelectedIndex int
 	Tag           string
 }
@@ -22,6 +23,7 @@ func (w ListWith) Make() *List {
 	list := &List{}
 	list.embodiment.Set(w.Embodiment)
 	list.listItems.Set(w.ListItems)
+	list.modelItem.Set(w.ModelItem)
 	list.selectedIndex.Set(w.SelectedIndex)
 	list.tag.Set(w.Tag)
 	return list
@@ -35,6 +37,7 @@ type List struct {
 
 	embodiment    StringField
 	listItems     Any1DField
+	modelItem     AnyField
 	selectedIndex IntegerField
 	tag           StringField
 }
@@ -70,9 +73,11 @@ func (list *List) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
 	switch nextIndex {
 	case 0:
 		return list.ListItems()[locator.NextIndex()]
-	default:
-		panic("cannot locate descendent using a pkey that we assumed was valid")
+	case 1:
+		return list.ModelItem()
 	}
+
+	panic("cannot locate descendent using a pkey that we assumed was valid")
 }
 
 // Returns a JSON string specifying the embodiment to use for this primitive.
@@ -91,15 +96,26 @@ func (list *List) ListItems() []Primitive {
 	return list.listItems.Get()
 }
 
-// Sets the ttems to show in the list.
+// Sets the items to show in the list.
 func (list *List) SetListItems(items []Primitive) *List {
 	list.listItems.Set(items)
 	return list
 }
 
-// Returns the ttems to show in the list (as a variadic argument list).
+// Returns the items to show in the list (as a variadic argument list).
 func (list *List) SetListItemsVA(items ...Primitive) *List {
 	list.listItems.Set(items)
+	return list
+}
+
+// Returns the model item.
+func (list *List) ModelItem() Primitive {
+	return list.modelItem.Get()
+}
+
+// Sets the ttems to show in the list.
+func (list *List) SetModelItem(item Primitive) *List {
+	list.modelItem.Set(item)
 	return list
 }
 

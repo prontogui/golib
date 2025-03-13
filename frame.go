@@ -72,11 +72,16 @@ func (frame *Frame) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 // A non-recursive method to locate descendants by PKey.  This is used internally by this library
 // and normally should not be called by users of the library.
 func (frame *Frame) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
-	// TODO:  generalize this code by handling inside primitive Reserved area.
-	if locator.NextIndex() != 0 {
-		panic("cannot locate descendent using a pkey that we assumed was valid")
+	nextIndex := locator.NextIndex()
+
+	switch nextIndex {
+	case 0:
+		return frame.FrameItems()[locator.NextIndex()]
+	case 1:
+		return frame.Icon()
 	}
-	return frame.FrameItems()[locator.NextIndex()]
+
+	panic("cannot locate descendent using a pkey that we assumed was valid")
 }
 
 // Returns a JSON string specifying the embodiment to use for this primitive.

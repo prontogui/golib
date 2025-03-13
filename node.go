@@ -61,13 +61,15 @@ func (node *Node) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 // and normally should not be called by users of the library.
 func (node *Node) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
 	nextIndex := locator.NextIndex()
-	if nextIndex == 0 {
+
+	switch nextIndex {
+	case 0:
 		return node.NodeItem()
-	} else if nextIndex == 1 {
+	case 1:
 		return node.SubNodes()[locator.NextIndex()]
-	} else {
-		panic("cannot locate descendent using a pkey that we assumed was valid")
 	}
+
+	panic("cannot locate descendent using a pkey that we assumed was valid")
 }
 
 // Returns a JSON string specifying the embodiment to use for this primitive.

@@ -78,17 +78,16 @@ func (table *Table) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
 	// Fields are handled in alphabetical order
 	switch nextIndex {
 	case 0:
-		col := locator.NextIndex()
-		return table.ModelRow()[col]
+		return table.ModelRow()[locator.NextIndex()]
 	case 1:
 		// TODO:  Optimization - add a row/col accessor to Any2D field so we don't return all the contents just
 		// to index a single item here.  Same could be done for Any1D.
 		row := locator.NextIndex()
 		col := locator.NextIndex()
 		return table.Rows()[row][col]
-	default:
-		panic("cannot locate descendent using a pkey that we assumed was valid")
 	}
+
+	panic("cannot locate descendent using a pkey that we assumed was valid")
 }
 
 // Returns a JSON string specifying the embodiment to use for this primitive.

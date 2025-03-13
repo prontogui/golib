@@ -109,7 +109,7 @@ func (s *Synchro) GetTopPrimitives() []Primitive {
 func (s *Synchro) GetPartialUpdate() ([]byte, error) {
 
 	if len(s.pendingUpdates) == 0 {
-		return nil, nil
+		return cbor.Marshal(nil)
 	}
 
 	updateList := []any{false}

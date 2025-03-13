@@ -67,6 +67,24 @@ func (card *Card) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 	})
 }
 
+// A non-recursive method to locate descendants by PKey.  This is used internally by this library
+// and normally should not be called by users of the library.
+func (card *Card) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
+	nextIndex := locator.NextIndex()
+	switch nextIndex {
+	case 0:
+		return card.LeadingItem()
+	case 1:
+		return card.MainItem()
+	case 2:
+		return card.SubItem()
+	case 3:
+		return card.TrailingItem()
+	}
+
+	panic("cannot locate descendent using a pkey that we assumed was valid")
+}
+
 // Returns a string representation of this primitive:  the mainItem.
 // Implements of fmt:Stringer interface.
 func (card *Card) String() string {
