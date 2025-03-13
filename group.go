@@ -14,6 +14,7 @@ import (
 type GroupWith struct {
 	Embodiment string
 	GroupItems []Primitive
+	status     int
 	Tag        string
 }
 
@@ -22,6 +23,7 @@ func (w GroupWith) Make() *Group {
 	grp := &Group{}
 	grp.embodiment.Set(w.Embodiment)
 	grp.groupItems.Set(w.GroupItems)
+	grp.status.Set(w.status)
 	grp.tag.Set(w.Tag)
 	return grp
 }
@@ -35,6 +37,7 @@ type Group struct {
 
 	embodiment StringField
 	groupItems Any1DField
+	status     IntegerField
 	tag        StringField
 }
 
@@ -52,6 +55,7 @@ func (grp *Group) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 		return []FieldRef{
 			{key.FKey_Embodiment, &grp.embodiment},
 			{key.FKey_GroupItems, &grp.groupItems},
+			{key.FKey_Status, &grp.status},
 			{key.FKey_Tag, &grp.tag},
 		}
 	})
@@ -95,6 +99,17 @@ func (grp *Group) SetGroupItemsVA(items ...Primitive) *Group {
 	return grp
 }
 
+// Returns the status of the command:  0 = Command Normal, 1 = Command Disabled, 2 = Command Hidden.
+func (grp *Group) Status() int {
+	return grp.status.Get()
+}
+
+// Sets the status of the command:  0 = Command Normal, 1 = Command Disabled, 2 = Command Hidden.
+func (grp *Group) SetStatus(i int) *Group {
+	grp.status.Set(i)
+	return grp
+}
+
 // Returns an optional and arbitrary string to keep with this primitive.  This is useful for
 // identification later on, such as using Groups inside other containers.
 func (grp *Group) Tag() string {
@@ -105,5 +120,37 @@ func (grp *Group) Tag() string {
 // identification later on, such as using Groups inside other containers.
 func (grp *Group) SetTag(s string) *Group {
 	grp.tag.Set(s)
+	return grp
+}
+
+// Returns the visibility of the group.  This is derived from the Status field.
+func (grp *Group) Visible() bool {
+	return grp.status.Get() != 2
+}
+
+// Sets the visibility of the group.  Setting this to true will set Status to 0 (visible & enabled)
+// and setting this to false will set Status to 2 (hidden).
+func (grp *Group) SetVisible(visible bool) *Group {
+	if visible {
+		grp.status.Set(0)
+	} else {
+		grp.status.Set(2)
+	}
+	return grp
+}
+
+// Returns the enabled status of the group.  This is derived from the Status field.
+func (grp *Group) Enabled() bool {
+	return grp.status.Get() == 0
+}
+
+// Sets the enabled status of the group.  Setting this to true will set Status to 0 (visible & enabled)
+// and setting this to false will set Status to 1 (disabled).
+func (grp *Group) SetEnabled(enabled bool) *Group {
+	if enabled {
+		grp.status.Set(0)
+	} else {
+		grp.status.Set(1)
+	}
 	return grp
 }

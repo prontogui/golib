@@ -15,6 +15,7 @@ import (
 type TableWith struct {
 	Embodiment string
 	Headings   []string
+	ModelRow   []Primitive
 	Rows       [][]Primitive
 	Status     int
 	Tag        string
@@ -25,6 +26,7 @@ func (w TableWith) Make() *Table {
 	table := &Table{}
 	table.embodiment.Set(w.Embodiment)
 	table.headings.Set(w.Headings)
+	table.modelRow.Set(w.ModelRow)
 	table.rows.Set(w.Rows)
 	table.status.Set(w.Status)
 	table.tag.Set(w.Tag)
@@ -37,7 +39,8 @@ type Table struct {
 	PrimitiveBase
 
 	embodiment StringField
-	headings   Strings1DField
+	headings   String1DField
+	modelRow   Any1DField
 	rows       Any2DField
 	status     IntegerField
 	tag        StringField
@@ -57,6 +60,7 @@ func (table *Table) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 		return []FieldRef{
 			{key.FKey_Embodiment, &table.embodiment},
 			{key.FKey_Headings, &table.headings},
+			{key.FKey_ModelRow, &table.modelRow},
 			{key.FKey_Rows, &table.rows},
 			{key.FKey_Status, &table.status},
 			{key.FKey_Tag, &table.tag},
@@ -74,6 +78,9 @@ func (table *Table) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
 	// Fields are handled in alphabetical order
 	switch nextIndex {
 	case 0:
+		col := locator.NextIndex()
+		return table.ModelRow()[col]
+	case 1:
 		// TODO:  Optimization - add a row/col accessor to Any2D field so we don't return all the contents just
 		// to index a single item here.  Same could be done for Any1D.
 		row := locator.NextIndex()
@@ -109,6 +116,17 @@ func (table *Table) SetHeadings(s []string) *Table {
 // Sets the headings (as variadic arguments) to use for each column in the table.
 func (table *Table) SetHeadingsVA(items ...string) *Table {
 	table.headings.Set(items)
+	return table
+}
+
+// Returns the model row.
+func (table *Table) ModelRow() []Primitive {
+	return table.modelRow.Get()
+}
+
+// Sets the model row.
+func (table *Table) SetModelRow(items []Primitive) *Table {
+	table.modelRow.Set(items)
 	return table
 }
 

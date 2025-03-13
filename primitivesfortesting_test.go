@@ -13,7 +13,7 @@ type ComplexPrimitive struct {
 
 	Issued    BooleanField
 	Status    IntegerField
-	Choices   Strings1DField
+	Choices   String1DField
 	ListItems Any1DField
 	Rows      Any2DField
 	Data      BlobField

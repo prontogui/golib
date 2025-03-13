@@ -15,7 +15,7 @@ type TextWith struct {
 	Tag        string
 }
 
-// Creates a new Text primitive using the supplief field assignments.
+// Creates a new Text primitive using the supplied field assignments.
 func (w TextWith) Make() *Text {
 	text := &Text{}
 	text.content.Set(w.Content)

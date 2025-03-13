@@ -40,7 +40,7 @@ type ImportFile struct {
 	imported        BooleanField
 	name            StringField
 	tag             StringField
-	validExtensions Strings1DField
+	validExtensions String1DField
 }
 
 // Creates a new ImportFile.

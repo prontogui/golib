@@ -13,15 +13,15 @@ import (
 func Test_ListAttachedFields(t *testing.T) {
 	list := &List{}
 	list.PrepareForUpdates(key.NewPKey(), nil)
-	verifyAllFieldsAttached(t, list.PrimitiveBase, "Embodiment", "ListItems", "Selected", "Tag")
+	verifyAllFieldsAttached(t, list.PrimitiveBase, "Embodiment", "ListItems", "SelectedIndex", "Tag")
 }
 
 func Test_ListMake(t *testing.T) {
 	list := ListWith{
-		Embodiment: "scrolling",
-		ListItems:  []Primitive{&Command{}, &Command{}},
-		Selected:   1,
-		Tag:        "F",
+		Embodiment:    "scrolling",
+		ListItems:     []Primitive{&Command{}, &Command{}},
+		SelectedIndex: 1,
+		Tag:           "F",
 	}.Make()
 
 	if list.Embodiment() != "scrolling" {
@@ -32,7 +32,7 @@ func Test_ListMake(t *testing.T) {
 		t.Error("'ListItems' field was not initialized correctly")
 	}
 
-	if list.Selected() != 1 {
+	if list.SelectedIndex() != 1 {
 		t.Error("List selection not initialized properly")
 	}
 
@@ -91,18 +91,18 @@ func Test_ListFieldSettings(t *testing.T) {
 
 	// Selected field tests
 
-	list.SetSelected(-1)
-	if list.Selected() != -1 {
+	list.SetSelectedIndex(-1)
+	if list.SelectedIndex() != -1 {
 		t.Error("Unable to set seletion to -1")
 	}
 
-	list.SetSelected(0)
-	if list.Selected() != 0 {
+	list.SetSelectedIndex(0)
+	if list.SelectedIndex() != 0 {
 		t.Error("Unable to set seletion to 0")
 	}
 
-	list.SetSelected(1)
-	if list.Selected() != 1 {
+	list.SetSelectedIndex(1)
+	if list.SelectedIndex() != 1 {
 		t.Error("Unable to set seletion to 1")
 	}
 
@@ -139,20 +139,20 @@ func Test_ListSelectedItem(t *testing.T) {
 	list := &List{}
 
 	// Test when no item is selected
-	list.SetSelected(-1)
+	list.SetSelectedIndex(-1)
 	if list.SelectedItem() != nil {
 		t.Error("Expected nil when no item is selected")
 	}
 
 	// Test when selected index is out of range
 	list.SetListItems([]Primitive{&Command{}, &Command{}})
-	list.SetSelected(2)
+	list.SetSelectedIndex(2)
 	if list.SelectedItem() != nil {
 		t.Error("Expected nil when selected index is out of range")
 	}
 
 	// Test when selected index is within range
-	list.SetSelected(1)
+	list.SetSelectedIndex(1)
 	if list.SelectedItem() == nil {
 		t.Error("Expected a valid item when selected index is within range")
 	}
@@ -160,7 +160,7 @@ func Test_ListSelectedItem(t *testing.T) {
 	// Verify the selected item is correct
 	cmd := &Command{}
 	list.SetListItems([]Primitive{&Command{}, cmd})
-	list.SetSelected(1)
+	list.SetSelectedIndex(1)
 	if list.SelectedItem() != cmd {
 		t.Error("SelectedItem did not return the correct item")
 	}

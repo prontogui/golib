@@ -14,17 +14,21 @@ import (
 type FrameWith struct {
 	Embodiment string
 	FrameItems []Primitive
+	Icon       Primitive
 	Showing    bool
 	Tag        string
+	Title      string
 }
 
 // Creates a new Frame using the supplied field assignments.
 func (w FrameWith) Make() *Frame {
 	frame := &Frame{}
 	frame.embodiment.Set(w.Embodiment)
-	frame.showing.Set(w.Showing)
 	frame.frameItems.Set(w.FrameItems)
+	frame.icon.Set(w.Icon)
+	frame.showing.Set(w.Showing)
 	frame.tag.Set(w.Tag)
+	frame.title.Set(w.Title)
 	return frame
 }
 
@@ -39,6 +43,8 @@ type Frame struct {
 	frameItems Any1DField
 	showing    BooleanField
 	tag        StringField
+	title      StringField
+	icon       AnyField
 }
 
 // Creates a new Frame and assigns a set of items.
@@ -55,8 +61,10 @@ func (frame *Frame) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 		return []FieldRef{
 			{key.FKey_Embodiment, &frame.embodiment},
 			{key.FKey_FrameItems, &frame.frameItems},
+			{key.FKey_Icon, &frame.icon},
 			{key.FKey_Showing, &frame.showing},
 			{key.FKey_Tag, &frame.tag},
+			{key.FKey_Title, &frame.title},
 		}
 	})
 }
@@ -99,6 +107,17 @@ func (frame *Frame) SetFrameItemsVA(items ...Primitive) *Frame {
 	return frame
 }
 
+// Returns the optional icon item for this frame.
+func (frame *Frame) Icon() Primitive {
+	return frame.icon.Get()
+}
+
+// Sets the optional icon for this frame.
+func (frame *Frame) SetIcon(p Primitive) *Frame {
+	frame.icon.Set(p)
+	return frame
+}
+
 // Returns whether the Frame is being shown on the screen.
 func (frame *Frame) Showing() bool {
 	return frame.showing.Get()
@@ -120,5 +139,16 @@ func (frame *Frame) Tag() string {
 // identification later on, uch as using Frames inside other containers.
 func (frame *Frame) SetTag(s string) *Frame {
 	frame.tag.Set(s)
+	return frame
+}
+
+// Returns the title of the frame.
+func (frame *Frame) Title() string {
+	return frame.title.Get()
+}
+
+// Sets the title of the frame.
+func (frame *Frame) SetTitle(s string) *Frame {
+	frame.title.Set(s)
 	return frame
 }

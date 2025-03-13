@@ -11,10 +11,10 @@ import (
 // A list is a collection of primitives that have a sequential-like relationship
 // and might be dynamic in quantity or kind.
 type ListWith struct {
-	Embodiment string
-	ListItems  []Primitive
-	Selected   int
-	Tag        string
+	Embodiment    string
+	ListItems     []Primitive
+	SelectedIndex int
+	Tag           string
 }
 
 // Creates a new List using the supplied field assignments.
@@ -22,7 +22,7 @@ func (w ListWith) Make() *List {
 	list := &List{}
 	list.embodiment.Set(w.Embodiment)
 	list.listItems.Set(w.ListItems)
-	list.selected.Set(w.Selected)
+	list.selectedIndex.Set(w.SelectedIndex)
 	list.tag.Set(w.Tag)
 	return list
 }
@@ -33,10 +33,10 @@ type List struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
 
-	embodiment StringField
-	listItems  Any1DField
-	selected   IntegerField
-	tag        StringField
+	embodiment    StringField
+	listItems     Any1DField
+	selectedIndex IntegerField
+	tag           StringField
 }
 
 // Creates a new List and assigns items.
@@ -53,7 +53,7 @@ func (list *List) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 		return []FieldRef{
 			{key.FKey_Embodiment, &list.embodiment},
 			{key.FKey_ListItems, &list.listItems},
-			{key.FKey_Selected, &list.selected},
+			{key.FKey_SelectedIndex, &list.selectedIndex},
 			{key.FKey_Tag, &list.tag},
 		}
 	})
@@ -104,13 +104,13 @@ func (list *List) SetListItemsVA(items ...Primitive) *List {
 }
 
 // Returns the currently selected item or -1 for none selected.
-func (list *List) Selected() int {
-	return list.selected.Get()
+func (list *List) SelectedIndex() int {
+	return list.selectedIndex.Get()
 }
 
 // Sets the currently selected item or -1 for none selected.
-func (list *List) SetSelected(selected int) *List {
-	list.selected.Set(selected)
+func (list *List) SetSelectedIndex(selectedIndex int) *List {
+	list.selectedIndex.Set(selectedIndex)
 	return list
 }
 
@@ -131,9 +131,9 @@ func (list *List) SetTag(s string) *List {
 // If the selected index is within the valid range of list items, it returns the item at the selected index.
 // If the selected index is out of range, it returns nil.
 func (list *List) SelectedItem() Primitive {
-	selected := list.Selected()
-	if selected >= 0 && selected < len(list.ListItems()) {
-		return list.ListItems()[selected]
+	selectedIndex := list.SelectedIndex()
+	if selectedIndex >= 0 && selectedIndex < len(list.ListItems()) {
+		return list.ListItems()[selectedIndex]
 	}
 	return nil
 }

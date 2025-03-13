@@ -17,6 +17,7 @@ const (
 	FKey_Checked FKey = iota
 	FKey_Choice
 	FKey_Choices
+	FKey_ChoiceLabels
 	FKey_CommandIssued
 	FKey_Content
 	FKey_Data
@@ -25,20 +26,35 @@ const (
 	FKey_FrameItems
 	FKey_GroupItems
 	FKey_Headings
+	FKey_Icon
+	FKey_IconID
 	FKey_Image
 	FKey_Imported
 	FKey_Issued
 	FKey_Label
+	FKey_LeadingItem
 	FKey_ListItems
+	FKey_MainItem
+	FKey_ModelItem
+	FKey_ModelRow
 	FKey_Name
+	FKey_NodeItem
+	FKey_NumericEntry
 	FKey_PeriodMs
+	FKey_Root
 	FKey_Rows
-	FKey_Selected
+	FKey_SelectedIndex
+	FKey_SelectedPath
 	FKey_Showing
 	FKey_State
 	FKey_Status
+	FKey_SubItem
+	FKey_SubNodes
 	FKey_Tag
 	FKey_TextEntry
+	FKey_TimerFired
+	FKey_Title
+	FKey_TrailingItem
 	FKey_ValidExtensions
 
 	// RESERVED CONSTANT
@@ -55,6 +71,7 @@ func init() {
 	_fkeyToName[FKey_Checked] = "Checked"
 	_fkeyToName[FKey_Choice] = "Choice"
 	_fkeyToName[FKey_Choices] = "Choices"
+	_fkeyToName[FKey_ChoiceLabels] = "ChoiceLabels"
 	_fkeyToName[FKey_CommandIssued] = "CommandIssued"
 	_fkeyToName[FKey_Content] = "Content"
 	_fkeyToName[FKey_Data] = "Data"
@@ -63,20 +80,35 @@ func init() {
 	_fkeyToName[FKey_FrameItems] = "FrameItems"
 	_fkeyToName[FKey_GroupItems] = "GroupItems"
 	_fkeyToName[FKey_Headings] = "Headings"
+	_fkeyToName[FKey_Icon] = "Icon"
+	_fkeyToName[FKey_IconID] = "IconID"
 	_fkeyToName[FKey_Image] = "Image"
 	_fkeyToName[FKey_Imported] = "Imported"
 	_fkeyToName[FKey_Issued] = "Issued"
 	_fkeyToName[FKey_Label] = "Label"
+	_fkeyToName[FKey_LeadingItem] = "LeadingItem"
 	_fkeyToName[FKey_ListItems] = "ListItems"
+	_fkeyToName[FKey_MainItem] = "MainItem"
+	_fkeyToName[FKey_ModelItem] = "ModelItem"
+	_fkeyToName[FKey_ModelRow] = "ModelRow"
 	_fkeyToName[FKey_Name] = "Name"
+	_fkeyToName[FKey_NodeItem] = "NodeItem"
+	_fkeyToName[FKey_NumericEntry] = "NumericEntry"
 	_fkeyToName[FKey_PeriodMs] = "PeriodMs"
+	_fkeyToName[FKey_Root] = "Root"
 	_fkeyToName[FKey_Rows] = "Rows"
-	_fkeyToName[FKey_Selected] = "Selected"
+	_fkeyToName[FKey_SelectedIndex] = "SelectedIndex"
+	_fkeyToName[FKey_SelectedPath] = "SelectedPath"
 	_fkeyToName[FKey_Showing] = "Showing"
 	_fkeyToName[FKey_State] = "State"
 	_fkeyToName[FKey_Status] = "Status"
+	_fkeyToName[FKey_SubItem] = "SubItem"
+	_fkeyToName[FKey_SubNodes] = "SubNodes"
 	_fkeyToName[FKey_Tag] = "Tag"
 	_fkeyToName[FKey_TextEntry] = "TextEntry"
+	_fkeyToName[FKey_TimerFired] = "TimerFired"
+	_fkeyToName[FKey_Title] = "Title"
+	_fkeyToName[FKey_TrailingItem] = "TrailingItem"
 	_fkeyToName[FKey_ValidExtensions] = "ValidExtensions"
 
 	_nameToFKey = make(map[string]FKey, FKey_MAXIMUMKEYS)
