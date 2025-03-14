@@ -64,11 +64,11 @@ func (grp *Group) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 // A non-recursive method to locate descendants by PKey.  This is used internally by this library
 // and normally should not be called by users of the library.
 func (grp *Group) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
-	// TODO:  generalize this code by handling inside primitive Reserved area.
-	if locator.NextIndex() != 0 {
-		panic("cannot locate descendent using a pkey that we assumed was valid")
+	if locator.NextIndex() == 0 {
+		return grp.GroupItems()[locator.NextIndex()]
 	}
-	return grp.GroupItems()[locator.NextIndex()]
+
+	panic("cannot locate descendent using a pkey that we assumed was valid")
 }
 
 // Returns a JSON string specifying the embodiment to use for this primitive.
