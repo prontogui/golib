@@ -21,6 +21,10 @@ type TimerWith struct {
 // Makes a new Timer with specified field values.
 func (w TimerWith) Make() *Timer {
 	timer := &Timer{}
+
+	// Must initialize the TimerFired field
+	timer.timerFired.TimestampProvider = getEventTimestamp
+
 	timer.embodiment.Set(w.Embodiment)
 	timer.periodMs.Set(w.PeriodMs)
 	timer.tag.Set(w.Tag)
@@ -38,6 +42,7 @@ type Timer struct {
 	embodiment StringField
 	periodMs   IntegerField
 	tag        StringField
+	timerFired EventField
 }
 
 // Create a new Timer with period in milliseconds.
@@ -55,6 +60,7 @@ func (tmr *Timer) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 			{key.FKey_Embodiment, &tmr.embodiment},
 			{key.FKey_PeriodMs, &tmr.periodMs},
 			{key.FKey_Tag, &tmr.tag},
+			{key.FKey_TimerFired, &tmr.timerFired},
 		}
 	})
 }
@@ -96,4 +102,9 @@ func (tmr *Timer) Tag() string {
 func (tmr *Timer) SetTag(s string) *Timer {
 	tmr.tag.Set(s)
 	return tmr
+}
+
+// Returns true if the command was issued during the current Wait cycle.
+func (tmr *Timer) Issued() bool {
+	return tmr.timerFired.Issued()
 }
