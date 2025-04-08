@@ -11,7 +11,7 @@ require (
 
 require (
 	github.com/x448/float16 v0.8.4 // indirect
-	golang.org/x/net v0.39.0 // indirect
+	golang.org/x/net v0.36.0 // indirect
 )
 
 require (
