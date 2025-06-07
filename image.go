@@ -5,10 +5,8 @@
 package golib
 
 import (
-	"image"
-	_ "image/png" // Question:  how much will this impact load performance for those not using Image?
-	"log"
-	"os"
+	//	"image"
+	//	_ "image/png" // Question:  how much will this impact load performance for those not using Image?
 
 	"github.com/prontogui/golib/key"
 )
@@ -27,10 +25,7 @@ func (w ImageWith) Make() *Image {
 	image.embodiment.Set(w.Embodiment)
 
 	if len(w.FromFile) > 0 {
-		loadedImage := loadImageFromFile(w.FromFile)
-		if loadedImage != nil {
-			image.image.Set(loadedImage.Pix)
-		}
+		image.image.LoadFromFile(w.FromFile)
 	} else {
 		image.image.Set(w.Image)
 	}
@@ -90,21 +85,12 @@ func (image *Image) SetImage(data []byte) *Image {
 	return image
 }
 
-func loadImageFromFile(filePath string) *image.RGBA {
-	imgFile, err := os.Open(filePath)
-	if err != nil {
-		log.Println("Cannot read file:", err)
-		return nil
-	}
-	defer imgFile.Close()
+func (image *Image) LoadFromFile(filename string) error {
+	return image.image.LoadFromFile(filename)
+}
 
-	img, _, err := image.Decode(imgFile)
-	if err != nil {
-		log.Println("Cannot decode file:", err)
-		return nil
-	}
-
-	return img.(*image.RGBA)
+func (image *Image) SaveToFile(filename string) error {
+	return image.image.SaveToFile(filename)
 }
 
 // Returns an optional and arbitrary string to keep with this primitive.  This is useful for

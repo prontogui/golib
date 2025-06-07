@@ -5,6 +5,7 @@
 package golib
 
 import (
+	"os"
 	"reflect"
 	"testing"
 
@@ -85,5 +86,76 @@ func Test_BlobIngestWrongValueType(t *testing.T) {
 
 	if err == nil {
 		t.Fatal("no error returned from IngestValue.  Expecting an error due to wrong value type.")
+	}
+}
+
+func Test_BlobLoadFromFile_Success(t *testing.T) {
+	tmpFile, err := os.CreateTemp("", "blobfield_load_test_file")
+	if err != nil {
+		t.Fatalf("failed to create temp file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+	defer tmpFile.Close()
+
+	content := []byte{1, 2, 3, 4, 5}
+	if _, err := tmpFile.Write(content); err != nil {
+		t.Fatalf("failed to write to temp file: %v", err)
+	}
+	tmpFile.Close() // Ensure file is closed before reading
+
+	var f BlobField
+	err = f.LoadFromFile(tmpFile.Name())
+	if err != nil {
+		t.Fatalf("LoadFromFile returned error: %v", err)
+	}
+	if !reflect.DeepEqual(f.Get(), content) {
+		t.Errorf("blob content mismatch: got %v, want %v", f.Get(), content)
+	}
+}
+
+func Test_BlobLoadFromFile_FileNotExist(t *testing.T) {
+	var f BlobField
+	err := f.LoadFromFile("nonexistent_file_123456789")
+	if err == nil {
+		t.Fatal("expected error when loading from non-existent file, got nil")
+	}
+}
+
+func Test_BlobSaveToFile_Success(t *testing.T) {
+	tmpFile, err := os.CreateTemp("", "blobfield_save_test_file")
+	if err != nil {
+		t.Fatalf("failed to create temp file: %v", err)
+	}
+	tmpFileName := tmpFile.Name()
+	tmpFile.Close()
+	defer os.Remove(tmpFileName)
+
+	content := []byte{9, 8, 7, 6, 5}
+	var f BlobField
+	f.Set(content)
+
+	err = f.SaveToFile(tmpFileName)
+	if err != nil {
+		t.Fatalf("SaveToFile returned error: %v", err)
+	}
+
+	readContent, err := os.ReadFile(tmpFileName)
+	if err != nil {
+		t.Fatalf("failed to read file after SaveToFile: %v", err)
+	}
+	if !reflect.DeepEqual(readContent, content) {
+		t.Errorf("file content mismatch: got %v, want %v", readContent, content)
+	}
+}
+
+func Test_BlobSaveToFile_FileCreateError(t *testing.T) {
+	var f BlobField
+	f.Set([]byte{1, 2, 3})
+
+	// Try to save to an invalid directory path
+	invalidPath := "/invalid_dir/should_fail_blobfield"
+	err := f.SaveToFile(invalidPath)
+	if err == nil {
+		t.Fatal("expected error when saving to invalid file path, got nil")
 	}
 }

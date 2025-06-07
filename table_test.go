@@ -128,19 +128,19 @@ func Test_TableGetChildPrimitive(t *testing.T) {
 		return table.LocateNextDescendant(locator).(*Command)
 	}
 
-	if locate(key.NewPKey(0, 0, 0)).Label() != "r0c0" {
+	if locate(key.NewPKey(1, 0, 0)).Label() != "r0c0" {
 		t.Fatal("LocateNextDescendant doesn't return a child for pkey 0, 0, 0.")
 	}
 
-	if locate(key.NewPKey(0, 0, 1)).Label() != "r0c1" {
+	if locate(key.NewPKey(1, 0, 1)).Label() != "r0c1" {
 		t.Fatal("LocateNextDescendant doesn't return a child for pkey 0, 0, 1.")
 	}
 
-	if locate(key.NewPKey(0, 1, 0)).Label() != "r1c0" {
+	if locate(key.NewPKey(1, 1, 0)).Label() != "r1c0" {
 		t.Fatal("LocateNextDescendant doesn't return a child for pkey 0, 1, 0.")
 	}
 
-	if locate(key.NewPKey(0, 1, 1)).Label() != "r1c1" {
+	if locate(key.NewPKey(1, 1, 1)).Label() != "r1c1" {
 		t.Fatal("LocateNextDescendant doesn't return a child for pkey 0, 1, 1.")
 	}
 }

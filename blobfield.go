@@ -6,6 +6,7 @@ package golib
 
 import (
 	"errors"
+	"os"
 
 	"github.com/prontogui/golib/key"
 )
@@ -22,6 +23,29 @@ func (f *BlobField) Get() []byte {
 func (f *BlobField) Set(blob []byte) {
 	f.blob = blob
 	f.OnSet(false)
+}
+
+func (f *BlobField) LoadFromFile(filePath string) error {
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+	f.blob = data
+	f.OnSet(false)
+	return nil
+}
+
+func (f *BlobField) SaveToFile(filePath string) error {
+
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(f.blob)
+
+	return err
 }
 
 func (f *BlobField) PrepareForUpdates(fkey key.FKey, pkey key.PKey, fieldPKeyIndex int, onset key.OnSetFunction) (isContainer bool) {

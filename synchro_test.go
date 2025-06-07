@@ -5,6 +5,7 @@
 package golib
 
 import (
+	"bytes"
 	"reflect"
 	"testing"
 
@@ -139,9 +140,11 @@ func Test_PartialUpdate1(t *testing.T) {
 	s := NewSynchro()
 	s.SetTopPrimitives(cmd1, cmd2, cmd3)
 
+	emptyUpdate, _ := cbor.Marshal(nil)
+
 	// Test for no partial update yet
 	pu, err := s.GetPartialUpdate()
-	if pu != nil {
+	if !bytes.Equal(pu, emptyUpdate) {
 		t.Fatal("partial update available when nothing changed. Not expecting a partial update.")
 	}
 	if err != nil {
