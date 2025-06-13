@@ -5,47 +5,68 @@
 package golib
 
 import (
-	//	"image"
-	//	_ "image/png" // Question:  how much will this impact load performance for those not using Image?
-
 	"github.com/prontogui/golib/key"
 )
 
-// An image for displaying a graphic to display on the screen.  (EXPERIMENTAL)
+// An image for displaying a graphic to display on the screen.
 type ImageWith struct {
+	// Embodiment specification
 	Embodiment string
-	Image      []byte
-	FromFile   string
-	Tag        string
+
+	// Binary data representing the image.  Supported formats are: JPEG, PNG, GIF, Animated GIF, WebP, Animated WebP, BMP, and WBMP
+	Image []byte
+
+	// The file path containing an image.  If specified, this takes precedence over Image field.
+	// Supported file types are: JPEG, PNG, GIF, Animated GIF, WebP, Animated WebP, BMP, and WBMP
+	FromFile string
+
+	// Arbitraty tag string for the primitive
+	Tag string
+
+	// ID for this primitive. Used when referencing it from another primitive. This can be arbitrary but
+	// it should ideally be a unique string.  Otherwise, when two primitives have the same ID, there is no
+	// guarantee on which is referenced.
+	ID string
+
+	// Reference (ID) of another image primitive that contains the actual image data to display.  This allows
+	// a way to use the same image in multiple places in a more efficient manner.
+	Ref string
 }
 
 // Makes a new Image with specified field values.
-func (w ImageWith) Make() *Image {
+func (w ImageWith) Make() (*Image, error) {
 	image := &Image{}
 	image.embodiment.Set(w.Embodiment)
 
 	if len(w.FromFile) > 0 {
-		image.image.LoadFromFile(w.FromFile)
+		if err := image.image.LoadFromFile(w.FromFile); err != nil {
+			return nil, err
+		}
 	} else {
 		image.image.Set(w.Image)
 	}
 
 	image.tag.Set(w.Tag)
-	return image
+	image.id.Set(w.ID)
+	image.ref.Set(w.Ref)
+
+	return image, nil
 }
 
-// An image for displaying a graphic to display on the screen.  (EXPERIMENTAL)
+// An image for displaying a graphic to display on the screen.
 type Image struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
 
 	embodiment StringField
+	id         StringField
 	image      BlobField
+	ref        StringField
 	tag        StringField
 }
 
-// Creates a new Image from a file.  (EXPERIMENTAL)
-func NewImage(fromFile string) *Image {
+// Creates a new Image from a file.
+func NewImage(fromFile string) (*Image, error) {
 	return ImageWith{FromFile: fromFile}.Make()
 }
 
@@ -57,7 +78,9 @@ func (image *Image) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction) {
 	image.InternalPrepareForUpdates(pkey, onset, func() []FieldRef {
 		return []FieldRef{
 			{key.FKey_Embodiment, &image.embodiment},
+			{key.FKey_ID, &image.id},
 			{key.FKey_Image, &image.image},
+			{key.FKey_Ref, &image.ref},
 			{key.FKey_Tag, &image.tag},
 		}
 	})
@@ -71,6 +94,17 @@ func (image *Image) Embodiment() string {
 // Sets a JSON string specifying the embodiment to use for this primitive.
 func (image *Image) SetEmbodiment(s string) *Image {
 	image.embodiment.Set(s)
+	return image
+}
+
+// Returns a JSON string specifying the embodiment to use for this primitive.
+func (image *Image) ID() string {
+	return image.id.Get()
+}
+
+// Sets a JSON string specifying the embodiment to use for this primitive.
+func (image *Image) SetID(s string) *Image {
+	image.id.Set(s)
 	return image
 }
 
@@ -91,6 +125,17 @@ func (image *Image) LoadFromFile(filename string) error {
 
 func (image *Image) SaveToFile(filename string) error {
 	return image.image.SaveToFile(filename)
+}
+
+// Returns a JSON string specifying the embodiment to use for this primitive.
+func (image *Image) Ref() string {
+	return image.ref.Get()
+}
+
+// Sets a JSON string specifying the embodiment to use for this primitive.
+func (image *Image) SetRef(s string) *Image {
+	image.ref.Set(s)
+	return image
 }
 
 // Returns an optional and arbitrary string to keep with this primitive.  This is useful for

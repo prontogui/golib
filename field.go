@@ -7,7 +7,7 @@ package golib
 import "github.com/prontogui/golib/key"
 
 type Field interface {
-	PrepareForUpdates(fkey key.FKey, pkey key.PKey, fieldPKeyIndex int, onset key.OnSetFunction) (isContainer bool)
+	PrepareForUpdates(fkey key.FKey, pkey key.PKey, fieldPKeyIndex int, onset key.OnSetFunction) (isStructural bool)
 	EgestValue() any
 	IngestValue(value any) error
 }

@@ -28,6 +28,7 @@ const (
 	FKey_Headings
 	FKey_Icon
 	FKey_IconID
+	FKey_ID
 	FKey_Image
 	FKey_Imported
 	FKey_Issued
@@ -50,6 +51,7 @@ const (
 	FKey_Status
 	FKey_SubItem
 	FKey_SubNodes
+	FKey_Ref
 	FKey_Tag
 	FKey_TextEntry
 	FKey_TimerFired
@@ -82,6 +84,7 @@ func init() {
 	_fkeyToName[FKey_Headings] = "Headings"
 	_fkeyToName[FKey_Icon] = "Icon"
 	_fkeyToName[FKey_IconID] = "IconID"
+	_fkeyToName[FKey_ID] = "ID"
 	_fkeyToName[FKey_Image] = "Image"
 	_fkeyToName[FKey_Imported] = "Imported"
 	_fkeyToName[FKey_Issued] = "Issued"
@@ -95,6 +98,7 @@ func init() {
 	_fkeyToName[FKey_NodeItem] = "NodeItem"
 	_fkeyToName[FKey_NumericEntry] = "NumericEntry"
 	_fkeyToName[FKey_PeriodMs] = "PeriodMs"
+	_fkeyToName[FKey_Ref] = "Ref"
 	_fkeyToName[FKey_Root] = "Root"
 	_fkeyToName[FKey_Rows] = "Rows"
 	_fkeyToName[FKey_SelectedIndex] = "SelectedIndex"

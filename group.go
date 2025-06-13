@@ -14,7 +14,7 @@ import (
 type GroupWith struct {
 	Embodiment string
 	GroupItems []Primitive
-	status     int
+	Status     int
 	Tag        string
 }
 
@@ -23,7 +23,7 @@ func (w GroupWith) Make() *Group {
 	grp := &Group{}
 	grp.embodiment.Set(w.Embodiment)
 	grp.groupItems.Set(w.GroupItems)
-	grp.status.Set(w.status)
+	grp.status.Set(w.Status)
 	grp.tag.Set(w.Tag)
 	return grp
 }

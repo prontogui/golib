@@ -19,11 +19,15 @@ func Test_ImageAttachedFields(t *testing.T) {
 }
 
 func Test_ImageMake1(t *testing.T) {
-	image := ImageWith{
+	image, err := ImageWith{
 		Embodiment: "black-white",
 		Image:      []byte{0, 1, 2},
 		Tag:        "F",
 	}.Make()
+
+	if err != nil {
+		t.Error("unexpected error returned")
+	}
 
 	if image.Embodiment() != "black-white" {
 		t.Error("could not initialize Embodiment field")
@@ -39,7 +43,11 @@ func Test_ImageMake1(t *testing.T) {
 }
 
 func Test_ImageMake2(t *testing.T) {
-	image := ImageWith{Embodiment: "black-white", FromFile: "gopher.png"}.Make()
+	image, err := ImageWith{Embodiment: "black-white", FromFile: "gopher.png"}.Make()
+
+	if err != nil {
+		t.Error("unexpected error returned")
+	}
 
 	if image.Embodiment() != "black-white" {
 		t.Error("Could not initialize Embodiment field.")
