@@ -48,7 +48,9 @@ type ProntoGUI interface {
 	// AcceptSession blocks until a new client connects and returns a Session
 	// for that client. Only valid in multi-connection mode (after calling
 	// StartServingMultiple); returns an error if called in single-connection mode.
-	AcceptSession(ctx context.Context) (Session, error)
+	// It returns ErrCanceled if the context was canceled or ErrInterrupted if
+	// the caller interrupted the operation.
+	AcceptSession(ctx context.Context, interrupt chan bool) (Session, error)
 
 	// SetGUI sets the top-level primitives that define the GUI. Single-connection
 	// mode only. May be called before a client connects; the GUI will be sent
@@ -60,10 +62,12 @@ type ProntoGUI interface {
 	// if the client disconnects. Single-connection mode only.
 	Wait() (Primitive, error)
 
-	// WaitOrCancel is like Wait but also returns if the context is canceled.
-	// Returns error of ErrCanceled if it was canceled.
+	// WaitOrCancel is like Wait but also returns if the context is canceled
+	// or the interrupt channel is selected.
+	// Returns error of ErrCanceled if it was canceled or ErrInterrupted if
+	// interrupted by the caller.
 	// Single-connection mode only.
-	WaitOrCancel(ctx context.Context) (Primitive, error)
+	WaitOrCancel(ctx context.Context, interrupt chan bool) (Primitive, error)
 
 	// Update sends the current GUI state to the client and checks for an
 	// inbound update without blocking. Returns nil if no update is available.
@@ -149,7 +153,7 @@ func (pg *_ProntoGUI) StopServing() {
 	pg.isServing = false
 }
 
-func (pg *_ProntoGUI) AcceptSession(ctx context.Context) (Session, error) {
+func (pg *_ProntoGUI) AcceptSession(ctx context.Context, interrupt chan bool) (Session, error) {
 	if !pg.isServing {
 		return nil, errors.New("not currently serving clients")
 	}
@@ -166,6 +170,8 @@ func (pg *_ProntoGUI) AcceptSession(ctx context.Context) (Session, error) {
 		return session, nil
 	case <-ctx.Done():
 		return nil, ErrCanceled
+	case <-interrupt:
+		return nil, ErrInterrupted
 	}
 }
 
@@ -264,7 +270,7 @@ func (pg *_ProntoGUI) Wait() (Primitive, error) {
 	return p, err
 }
 
-func (pg *_ProntoGUI) WaitOrCancel(ctx context.Context) (Primitive, error) {
+func (pg *_ProntoGUI) WaitOrCancel(ctx context.Context, interrupt chan bool) (Primitive, error) {
 	if !pg.isServing {
 		return nil, errors.New("not currently serving clients")
 	}
@@ -283,7 +289,7 @@ func (pg *_ProntoGUI) WaitOrCancel(ctx context.Context) (Primitive, error) {
 	}
 
 	// Exchange updates and wait until App has an update.
-	p, err := pg.defaultSession.WaitOrCancel(ctx)
+	p, err := pg.defaultSession.WaitOrCancel(ctx, interrupt)
 	if err == ErrSessionDisconnected {
 		pg.defaultSession = nil
 		err = nil

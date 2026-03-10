@@ -35,7 +35,7 @@ func Test_AcceptSession_AfterStop(t *testing.T) {
 	}
 	pg.StopServing()
 
-	_, err = pg.AcceptSession(context.Background())
+	_, err = pg.AcceptSession(context.Background(), nil)
 	if err == nil {
 		t.Fatal("expected error from AcceptSession after StopServing")
 	}

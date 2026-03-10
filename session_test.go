@@ -99,7 +99,7 @@ func Test_Session_WaitOrCancel_Cancelled(t *testing.T) {
 		cancel()
 	}()
 
-	_, err := s.WaitOrCancel(ctx)
+	_, err := s.WaitOrCancel(ctx, nil)
 	if err != ErrCanceled {
 		t.Fatalf("expecting ErrCanceled to be returned; got unexpected error: %v", err)
 	}

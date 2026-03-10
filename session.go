@@ -27,6 +27,10 @@ var ErrServingStopped = errors.New("serving stopped")
 // WaitOrCancel or AcceptSession functions.
 var ErrCanceled = errors.New("operation canceled by provided context")
 
+// Defined error indicating that the operation was interruptred by the
+// caller using the interrupt channel argument.
+var ErrInterrupted = errors.New("operation was interrupted by the caller")
+
 // Session represents a single client connection with its own GUI lifecycle.
 type Session interface {
 	// SetGUI sets the top-level primitives that define the GUI.
@@ -38,8 +42,9 @@ type Session interface {
 	Wait() (Primitive, error)
 
 	// WaitOrCancel is like Wait but also returns ErrCanceled if the context
-	// is canceled before an update arrives.
-	WaitOrCancel(ctx context.Context) (Primitive, error)
+	// is canceled or ErrInterrupted if the interrupt channel is selected
+	// before an update arrives.
+	WaitOrCancel(ctx context.Context, interrupt chan bool) (Primitive, error)
 
 	// Update sends the current GUI state to the client and checks for an
 	// inbound update without blocking. Returns nil if no update is available.
@@ -119,7 +124,7 @@ func (s *_Session) Wait() (Primitive, error) {
 
 // WaitOrCancel is like Wait but also returns ErrCanceled if the provided
 // context is canceled before an update arrives from the client.
-func (s *_Session) WaitOrCancel(ctx context.Context) (Primitive, error) {
+func (s *_Session) WaitOrCancel(ctx context.Context, interrupt chan bool) (Primitive, error) {
 	updateOut, err := s.getNextUpdate()
 	if err != nil {
 		return nil, err
@@ -133,6 +138,10 @@ func (s *_Session) WaitOrCancel(ctx context.Context) (Primitive, error) {
 		return nil, ErrServingStopped
 	case <-ctx.Done():
 		return nil, ErrCanceled
+	}
+
+	if interrupt != nil {
+
 	}
 
 	// Wait for inbound update or cancellation.
@@ -154,6 +163,9 @@ func (s *_Session) WaitOrCancel(ctx context.Context) (Primitive, error) {
 
 	case <-ctx.Done():
 		return nil, ErrCanceled
+
+	case <-interrupt:
+		return nil, ErrInterrupted
 
 	case <-s.apicall.ServingStopped:
 		return nil, ErrServingStopped
