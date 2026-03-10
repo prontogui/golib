@@ -140,10 +140,6 @@ func (s *_Session) WaitOrCancel(ctx context.Context, interrupt chan bool) (Primi
 		return nil, ErrCanceled
 	}
 
-	if interrupt != nil {
-
-	}
-
 	// Wait for inbound update or cancellation.
 	select {
 	case updateIn, ok := <-s.apicall.Inbound:
