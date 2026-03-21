@@ -10,12 +10,13 @@ import (
 	"github.com/prontogui/golib/key"
 )
 
-// A folder represents a collapsible item at a given level within a hierarchy.  It is normally
-// used inside a List or Table primitive to display hierarchical data.
+// A folder represents a container in a hierarchical list structure. It contains a label item
+// (any primitive) and a level indicating its depth in the hierarchy. The Expanded field controls
+// whether items logically "inside" this folder are shown.
 type FolderWith struct {
 	Embodiment string
-	Expanded bool
-	Item       Primitive
+	Expanded   bool
+	LabelItem  Primitive
 	Level      int
 	Status     int
 	Tag        string
@@ -26,30 +27,31 @@ func (w FolderWith) Make() *Folder {
 	folder := &Folder{}
 	folder.embodiment.Set(w.Embodiment)
 	folder.expanded.Set(w.Expanded)
-	folder.item.Set(w.Item)
+	folder.labelItem.Set(w.LabelItem)
 	folder.level.Set(w.Level)
 	folder.status.Set(w.Status)
 	folder.tag.Set(w.Tag)
 	return folder
 }
 
-// A folder represents a collapsible item at a given level within a hierarchy.  It is normally
-// used inside a List or Table primitive to display hierarchical data.
+// A folder represents a container in a hierarchical list structure. It contains a label item
+// (any primitive) and a level indicating its depth in the hierarchy. The Expanded field controls
+// whether items logically "inside" this folder are shown.
 type Folder struct {
 	// Mix-in the common guts for primitives
 	PrimitiveBase
 
 	embodiment StringField
-	expanded BooleanField
-	item       AnyField
+	expanded   BooleanField
+	labelItem  AnyField
 	level      IntegerField
 	status     IntegerField
 	tag        StringField
 }
 
-// Creates a new Folder at a specified level and assigns the item.
-func NewFolder(item Primitive, level int) *Folder {
-	return FolderWith{Item: item, Level: level}.Make()
+// Creates a new Folder at a specified level and assigns the label item.
+func NewFolder(labelItem Primitive, level int) *Folder {
+	return FolderWith{LabelItem: labelItem, Level: level}.Make()
 }
 
 // Prepares the primitive for tracking pending updates to send to the app and
@@ -61,7 +63,7 @@ func (folder *Folder) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction, 
 		return []FieldRef{
 			{key.FKey_Embodiment, &folder.embodiment},
 			{key.FKey_Expanded, &folder.expanded},
-			{key.FKey_Item, &folder.item},
+			{key.FKey_LabelItem, &folder.labelItem},
 			{key.FKey_Level, &folder.level},
 			{key.FKey_Status, &folder.status},
 			{key.FKey_Tag, &folder.tag},
@@ -77,7 +79,7 @@ func (folder *Folder) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
 	// Fields are handled in alphabetical order
 	switch nextIndex {
 	case 0:
-		return folder.Item()
+		return folder.LabelItem()
 	}
 
 	panic("cannot locate descendent using a pkey that we assumed was valid")
@@ -111,14 +113,14 @@ func (folder *Folder) SetExpanded(b bool) *Folder {
 	return folder
 }
 
-// Returns the item for this folder.
-func (folder *Folder) Item() Primitive {
-	return folder.item.Get()
+// Returns the label item for this folder.
+func (folder *Folder) LabelItem() Primitive {
+	return folder.labelItem.Get()
 }
 
-// Sets the item for this folder.
-func (folder *Folder) SetItem(p Primitive) *Folder {
-	folder.item.Set(p)
+// Sets the label item for this folder.
+func (folder *Folder) SetLabelItem(p Primitive) *Folder {
+	folder.labelItem.Set(p)
 	return folder
 }
 
