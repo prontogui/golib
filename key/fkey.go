@@ -42,6 +42,7 @@ const (
 	FKey_Level
 	FKey_ListItems
 	FKey_MainItem
+	FKey_ModelFolder
 	FKey_ModelItem
 	FKey_ModelRow
 	FKey_Name
@@ -101,6 +102,7 @@ func init() {
 	_fkeyToName[FKey_Level] = "Level"
 	_fkeyToName[FKey_ListItems] = "ListItems"
 	_fkeyToName[FKey_MainItem] = "MainItem"
+	_fkeyToName[FKey_ModelFolder] = "ModelFolder"
 	_fkeyToName[FKey_ModelItem] = "ModelItem"
 	_fkeyToName[FKey_ModelRow] = "ModelRow"
 	_fkeyToName[FKey_Name] = "Name"

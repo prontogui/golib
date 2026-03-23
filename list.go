@@ -13,13 +13,14 @@ import (
 // A list is a collection of primitives that have a sequential-like relationship
 // and might be dynamic in quantity or kind.
 type ListWith struct {
-	Embodiment    string
-	ListItems     []Primitive
-	ModelItem     Primitive
-	SelectedItems []int
-	SelectionMode int
-	Status        int
-	Tag           string
+	Embodiment      string
+	ListItems       []Primitive
+	ModelFolder Primitive
+	ModelItem       Primitive
+	SelectedItems   []int
+	SelectionMode   int
+	Status          int
+	Tag             string
 }
 
 // Creates a new List using the supplied field assignments.
@@ -28,6 +29,7 @@ func (w ListWith) Make() *List {
 
 	list.embodiment.Set(w.Embodiment)
 	list.listItems.Set(w.ListItems)
+	list.modelFolder.Set(w.ModelFolder)
 	list.modelItem.Set(w.ModelItem)
 	list.selectedItems.Set(w.SelectedItems)
 	list.selectionMode.Set(w.SelectionMode)
@@ -44,6 +46,7 @@ type List struct {
 
 	embodiment       StringField
 	listItems        Any1DField
+	modelFolder  AnyField
 	modelItem        AnyField
 	selectedItems    Integer1DField
 	selectionMode    IntegerField
@@ -66,6 +69,7 @@ func (list *List) PrepareForUpdates(pkey key.PKey, onset key.OnSetFunction, etsp
 		return []FieldRef{
 			{key.FKey_Embodiment, &list.embodiment},
 			{key.FKey_ListItems, &list.listItems},
+			{key.FKey_ModelFolder, &list.modelFolder},
 			{key.FKey_ModelItem, &list.modelItem},
 			{key.FKey_SelectedItems, &list.selectedItems},
 			{key.FKey_SelectionChanged, &list.selectionChanged},
@@ -88,6 +92,8 @@ func (list *List) LocateNextDescendant(locator *key.PKeyLocator) Primitive {
 	case 0:
 		return list.ListItems()[locator.NextIndex()]
 	case 1:
+		return list.ModelFolder()
+	case 2:
 		return list.ModelItem()
 	}
 
@@ -122,12 +128,23 @@ func (list *List) SetListItemsVA(items ...Primitive) *List {
 	return list
 }
 
+// Returns the model folder item.
+func (list *List) ModelFolder() Primitive {
+	return list.modelFolder.Get()
+}
+
+// Sets the model folder item.
+func (list *List) SetModelFolder(item Primitive) *List {
+	list.modelFolder.Set(item)
+	return list
+}
+
 // Returns the model item.
 func (list *List) ModelItem() Primitive {
 	return list.modelItem.Get()
 }
 
-// Sets the ttems to show in the list.
+// Sets the model item.
 func (list *List) SetModelItem(item Primitive) *List {
 	list.modelItem.Set(item)
 	return list
