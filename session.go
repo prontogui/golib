@@ -16,11 +16,7 @@ import (
 
 // Defined error indicating the session ended, typically when a client disconnects.
 // This can be returned from Wait, WaitOrCancel, or Update functions.
-var ErrSessionDisconnected = errors.New("session disconnected")
-
-// Defined error indicating that serving has stopped.
-// This can be returned from Wait, WaitOrCancel, or Update functions.
-var ErrServingStopped = errors.New("serving stopped")
+var ErrSessionEnded = errors.New("session ended")
 
 // Defined error indicating that the operation was canceled by way
 // of the context provided in the call.  This can be returned from
@@ -97,8 +93,8 @@ func (s *_Session) Wait() (Primitive, error) {
 	select {
 	case s.apicall.Outbound <- updateOut:
 		break
-	case <-s.apicall.ServingStopped:
-		return nil, ErrServingStopped
+	case <-s.apicall.CallHasExited:
+		return nil, ErrSessionEnded
 	}
 
 	// Wait for inbound update from client.
@@ -106,7 +102,7 @@ func (s *_Session) Wait() (Primitive, error) {
 	case updateIn, ok := <-s.apicall.Inbound:
 		if !ok {
 			s.fullupdate = true
-			return nil, ErrSessionDisconnected
+			return nil, ErrSessionEnded
 		}
 
 		s.updateEventTimestamp()
@@ -117,8 +113,8 @@ func (s *_Session) Wait() (Primitive, error) {
 
 		return s.synchro.IngestUpdate(updateIn)
 
-	case <-s.apicall.ServingStopped:
-		return nil, ErrServingStopped
+	case <-s.apicall.CallHasExited:
+		return nil, ErrSessionEnded
 	}
 }
 
@@ -134,8 +130,8 @@ func (s *_Session) WaitOrCancel(ctx context.Context, interrupt chan bool) (Primi
 	select {
 	case s.apicall.Outbound <- updateOut:
 		break
-	case <-s.apicall.ServingStopped:
-		return nil, ErrServingStopped
+	case <-s.apicall.CallHasExited:
+		return nil, ErrSessionEnded
 	case <-ctx.Done():
 		return nil, ErrCanceled
 	}
@@ -145,7 +141,7 @@ func (s *_Session) WaitOrCancel(ctx context.Context, interrupt chan bool) (Primi
 	case updateIn, ok := <-s.apicall.Inbound:
 		if !ok {
 			s.fullupdate = true
-			return nil, ErrSessionDisconnected
+			return nil, ErrSessionEnded
 		}
 
 		s.updateEventTimestamp()
@@ -163,8 +159,8 @@ func (s *_Session) WaitOrCancel(ctx context.Context, interrupt chan bool) (Primi
 	case <-interrupt:
 		return nil, ErrInterrupted
 
-	case <-s.apicall.ServingStopped:
-		return nil, ErrServingStopped
+	case <-s.apicall.CallHasExited:
+		return nil, ErrSessionEnded
 	}
 }
 
@@ -182,8 +178,8 @@ func (s *_Session) Update() (Primitive, error) {
 	select {
 	case s.apicall.Outbound <- updateOut:
 		break
-	case <-s.apicall.ServingStopped:
-		return nil, ErrServingStopped
+	case <-s.apicall.CallHasExited:
+		return nil, ErrSessionEnded
 	}
 
 	// Non-blocking check for inbound update.
@@ -191,7 +187,7 @@ func (s *_Session) Update() (Primitive, error) {
 	case updateIn, ok := <-s.apicall.Inbound:
 		if !ok {
 			s.fullupdate = true
-			return nil, ErrSessionDisconnected
+			return nil, ErrSessionEnded
 		}
 
 		s.updateEventTimestamp()

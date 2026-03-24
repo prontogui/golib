@@ -26,8 +26,8 @@ type StreamingAPICall struct {
 	// Streaming data going to the client App
 	Outbound chan []byte
 
-	// Signals that serving has stopped
-	ServingStopped chan byte
+	// Signals that API call has exited
+	CallHasExited chan byte
 }
 
 // Implementation of the PGServer
@@ -85,9 +85,9 @@ func (pgc *PGComm) StreamUpdates(stream grpc.BidiStreamingServer[pb.PGUpdate, pb
 	}()
 
 	apicall := &StreamingAPICall{
-		Inbound:        make(chan []byte, 2),
-		Outbound:       make(chan []byte, 2),
-		ServingStopped: make(chan byte),
+		Inbound:       make(chan []byte, 2),
+		Outbound:      make(chan []byte, 2),
+		CallHasExited: make(chan byte),
 	}
 
 	// Deliver this session to AcceptSession.
@@ -133,7 +133,7 @@ func (pgc *PGComm) StreamUpdates(stream grpc.BidiStreamingServer[pb.PGUpdate, pb
 	}
 
 cleanup:
-	close(apicall.ServingStopped)
+	close(apicall.CallHasExited)
 
 	close(apicall.Inbound)
 	close(cancelOutbound)

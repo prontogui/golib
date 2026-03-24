@@ -263,7 +263,7 @@ func (pg *_ProntoGUI) Wait() (Primitive, error) {
 
 	// Exchange updates and wait until App has an update.
 	p, err := pg.defaultSession.Wait()
-	if err == ErrSessionDisconnected {
+	if err == ErrSessionEnded {
 		pg.defaultSession = nil
 		err = nil
 	}
@@ -290,7 +290,7 @@ func (pg *_ProntoGUI) WaitOrCancel(ctx context.Context, interrupt chan bool) (Pr
 
 	// Exchange updates and wait until App has an update.
 	p, err := pg.defaultSession.WaitOrCancel(ctx, interrupt)
-	if err == ErrSessionDisconnected {
+	if err == ErrSessionEnded {
 		pg.defaultSession = nil
 		err = nil
 	}
@@ -316,7 +316,7 @@ func (pg *_ProntoGUI) Update() (Primitive, error) {
 	}
 
 	p, err := pg.defaultSession.Update()
-	if err == ErrSessionDisconnected {
+	if err == ErrSessionEnded {
 		pg.defaultSession = nil
 		err = nil
 	}
