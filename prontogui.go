@@ -175,7 +175,7 @@ func (pg *_ProntoGUI) AcceptSession(ctx context.Context, interrupt chan bool) (S
 	}
 }
 
-func (pg *_ProntoGUI) checkForDefaultSession(block bool, ctx context.Context) error {
+func (pg *_ProntoGUI) checkForDefaultSession(block bool, ctx context.Context, interrupt chan bool) error {
 
 	var session Session
 	var ok bool
@@ -186,6 +186,7 @@ func (pg *_ProntoGUI) checkForDefaultSession(block bool, ctx context.Context) er
 		if !ok {
 			return errors.New("server was stopped")
 		}
+
 	default:
 	}
 
@@ -199,12 +200,17 @@ func (pg *_ProntoGUI) checkForDefaultSession(block bool, ctx context.Context) er
 				}
 			case <-ctx.Done():
 				return ErrCanceled
+			case <-interrupt:
+				return ErrInterrupted
 			}
 		} else {
-			// Block until a session is started
-			session, ok = <-pg.sessionDelivery
-			if !ok {
-				return errors.New("server was stopped")
+			select {
+			case session, ok = <-pg.sessionDelivery:
+				if !ok {
+					return errors.New("server was stopped")
+				}
+			case <-interrupt:
+				return ErrInterrupted
 			}
 		}
 	}
@@ -229,7 +235,7 @@ func (pg *_ProntoGUI) SetGUI(primitives ...Primitive) error {
 		return errors.New("SetGUI is only available when using StartServingSingle")
 	}
 
-	err := pg.checkForDefaultSession(false, nil)
+	err := pg.checkForDefaultSession(false, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -252,7 +258,7 @@ func (pg *_ProntoGUI) Wait() (Primitive, error) {
 		return nil, errors.New("Wait is only available when using StartServingSingle")
 	}
 
-	err := pg.checkForDefaultSession(true, nil)
+	err := pg.checkForDefaultSession(true, nil, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -279,7 +285,7 @@ func (pg *_ProntoGUI) WaitOrCancel(ctx context.Context, interrupt chan bool) (Pr
 		return nil, errors.New("WaitOrCancel is only available when using StartServingSingle")
 	}
 
-	err := pg.checkForDefaultSession(true, ctx)
+	err := pg.checkForDefaultSession(true, ctx, interrupt)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +312,7 @@ func (pg *_ProntoGUI) Update() (Primitive, error) {
 		return nil, errors.New("Update is only available when using StartServingSingle")
 	}
 
-	err := pg.checkForDefaultSession(false, nil)
+	err := pg.checkForDefaultSession(false, nil, nil)
 	if err != nil {
 		return nil, err
 	}

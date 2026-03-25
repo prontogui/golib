@@ -130,13 +130,15 @@ func (s *_Session) WaitOrCancel(ctx context.Context, interrupt chan bool) (Primi
 	select {
 	case s.apicall.Outbound <- updateOut:
 		break
-	case <-s.apicall.CallHasExited:
-		return nil, ErrSessionEnded
 	case <-ctx.Done():
 		return nil, ErrCanceled
+	case <-interrupt:
+		return nil, ErrInterrupted
+	case <-s.apicall.CallHasExited:
+		return nil, ErrSessionEnded
 	}
 
-	// Wait for inbound update or cancellation.
+	// Wait for inbound update or cancelation.
 	select {
 	case updateIn, ok := <-s.apicall.Inbound:
 		if !ok {
@@ -155,10 +157,8 @@ func (s *_Session) WaitOrCancel(ctx context.Context, interrupt chan bool) (Primi
 
 	case <-ctx.Done():
 		return nil, ErrCanceled
-
 	case <-interrupt:
 		return nil, ErrInterrupted
-
 	case <-s.apicall.CallHasExited:
 		return nil, ErrSessionEnded
 	}
