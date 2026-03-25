@@ -109,7 +109,7 @@ func (loc *PKeyLocator) NextIndex() int {
 }
 
 // Return true if the locator is at the last level and therefore
-// primitive hase been located.
+// primitive has been located.
 func (loc *PKeyLocator) Located() bool {
 	return loc.LocationLevel == (len(loc.PKey) - 1)
 }

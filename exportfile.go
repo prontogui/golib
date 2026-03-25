@@ -138,13 +138,13 @@ func (ef *ExportFile) SetTag(s string) *ExportFile {
 }
 
 // Returns the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *ExportFile) Status() int {
 	return p.status.Get()
 }
 
 // Sets the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *ExportFile) SetStatus(i int) *ExportFile {
 	p.status.Set(i)
 	return p

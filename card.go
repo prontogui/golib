@@ -170,13 +170,13 @@ func (card *Card) SetTrailingItem(p Primitive) *Card {
 }
 
 // Returns the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (card *Card) Status() int {
 	return card.status.Get()
 }
 
 // Sets the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (card *Card) SetStatus(i int) *Card {
 	card.status.Set(i)
 	return card

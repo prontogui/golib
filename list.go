@@ -111,7 +111,7 @@ func (list *List) SetEmbodiment(s string) *List {
 	return list
 }
 
-// Returns the ttems to show in the list.
+// Returns the items to show in the list.
 func (list *List) ListItems() []Primitive {
 	return list.listItems.Get()
 }
@@ -188,13 +188,13 @@ func (list *List) SetTag(s string) *List {
 }
 
 // Returns the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *List) Status() int {
 	return p.status.Get()
 }
 
 // Sets the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *List) SetStatus(i int) *List {
 	p.status.Set(i)
 	return p

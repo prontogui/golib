@@ -147,7 +147,7 @@ func (frame *Frame) Tag() string {
 }
 
 // Sets an optional and arbitrary string to keep with this primitive.  This is useful for
-// identification later on, uch as using Frames inside other containers.
+// identification later on, such as using Frames inside other containers.
 func (frame *Frame) SetTag(s string) *Frame {
 	frame.tag.Set(s)
 	return frame
@@ -165,13 +165,13 @@ func (frame *Frame) SetTitle(s string) *Frame {
 }
 
 // Returns the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *Frame) Status() int {
 	return p.status.Get()
 }
 
 // Sets the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *Frame) SetStatus(i int) *Frame {
 	p.status.Set(i)
 	return p

@@ -45,7 +45,7 @@ type Choice struct {
 	tag          StringField
 }
 
-// Creates a new Choice and assigns the initiali Choice and Choices fields.
+// Creates a new Choice and assigns the initial Choice and Choices fields.
 func NewChoice(choices ...string) *Choice {
 	return ChoiceWith{Choices: choices}.Make().SetChoiceIndex(0)
 }
@@ -141,7 +141,7 @@ func (choice *Choice) SetTag(s string) *Choice {
 	return choice
 }
 
-// Returns the index (0, 1, ..) of selected choice or -1 if choice is empty.  This is a covenvenience
+// Returns the index (0, 1, ..) of selected choice or -1 if choice is empty.  This is a convenience
 // function as an alternative to Choice().  The canonical storage of choice remains a string.
 func (choice *Choice) ChoiceIndex() int {
 	currentChoice := choice.choice.Get()
@@ -155,7 +155,7 @@ func (choice *Choice) ChoiceIndex() int {
 }
 
 // Sets the selected choice or empty if none chosen or if index is out of range.
-// This is a covenvenience function as an alternative to SetChoice().  The canonical storage of
+// This is a convenience function as an alternative to SetChoice().  The canonical storage of
 // choice remains a string.
 func (choice *Choice) SetChoiceIndex(index int) *Choice {
 
@@ -172,13 +172,13 @@ func (choice *Choice) SetChoiceIndex(index int) *Choice {
 }
 
 // Returns the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *Choice) Status() int {
 	return p.status.Get()
 }
 
 // Sets the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *Choice) SetStatus(i int) *Choice {
 	p.status.Set(i)
 	return p

@@ -102,13 +102,13 @@ func (icon *Icon) SetTag(s string) *Icon {
 }
 
 // Returns the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *Icon) Status() int {
 	return p.status.Get()
 }
 
 // Sets the status of the primitive: 0 = visible and enabled,  1 = visible and disabled,
-// 2 = hiddend and disabled, 3 = collapsed and disabled.
+// 2 = hidden and disabled, 3 = collapsed and disabled.
 func (p *Icon) SetStatus(i int) *Icon {
 	p.status.Set(i)
 	return p
