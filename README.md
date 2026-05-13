@@ -6,7 +6,7 @@ Build a desktop GUI for your Go service or program without learning React, Flutt
 
 <!-- TODO: replace with a real demo GIF (e.g. docs/demo.gif). Keep it short (~5s) and showcase a live UI updating in response to a button press. -->
 <p align="center">
-  <img src="https://prontogui.com/wp-content/uploads/2026/05/pg-demo-clip-480.gif" alt="ProntoGUI demo" width="640">
+  <img src="https://prontogui.com/wp-content/uploads/2026/05/pg_demo_clip.gif" alt="ProntoGUI demo" width="640">
 </p>
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/prontogui/golib.svg)](https://pkg.go.dev/github.com/prontogui/golib)
