@@ -122,8 +122,6 @@ func (pgc *PGComm) StreamUpdates(stream grpc.BidiStreamingServer[pb.PGUpdate, pb
 			break
 		}
 
-		fmt.Printf("Update received with %d bytes.\n", len(uxs.Cbor))
-
 		select {
 		case apicall.Inbound <- uxs.Cbor:
 			continue

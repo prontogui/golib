@@ -4,6 +4,8 @@
 
 Build a desktop GUI for your Go service or program without learning React, Flutter, Qt, or any other frontend stack. Write your UI directly in Go and let the ProntoGUI App render it on macOS or Windows.
 
+Website: [www.prontogui.com](https://www.prontogui.com)
+
 <!-- TODO: replace with a real demo GIF (e.g. docs/demo.gif). Keep it short (~5s) and showcase a live UI updating in response to a button press. -->
 <p align="center">
   <img src="https://prontogui.com/wp-content/uploads/2026/05/pg_demo_clip.gif" alt="ProntoGUI demo" width="640">
